@@ -10,16 +10,16 @@ The showHide plugin that can toggle elements on a page. Also it includes some ma
 #### Options
 
 ```
-       {
-            separator     : ',',
-            joiner        : null,
-            limit         : 2,
-            showText      : "Show all ({{total}})",
-            hideText      : "Show less ({{limited}})",
-            wrapperMarkup : "{{items}}",
-            markup        : "{{item}}",
-            showAsTags    : false
-       }
+{
+     separator     : ',',
+     joiner        : null,
+     limit         : 2,
+     showText      : "Show all ({{total}})",
+     hideText      : "Show less ({{limited}})",
+     wrapperMarkup : "{{items}}",
+     markup        : "{{item}}",
+     showAsTags    : false
+}
 ```
 ##### Options Description
        {{total}}   : Total number of items
@@ -29,9 +29,9 @@ The showHide plugin that can toggle elements on a page. Also it includes some ma
 #### Example
 
 ```js
-    $('#element').showHide({
-        'separator': ';'
-    });
+$('#element').showHide({
+ 'separator': ';'
+});
 ```
 
 
