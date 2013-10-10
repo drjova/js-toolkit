@@ -4,9 +4,12 @@ A small jQuery toolkit
 
 Usage
 =====
+## showHide
+is a plugin that can toggle elements on a page. Also it includes some makrups options for the elements
 
-**showHide**
+'''js
+    $('#element').showHide();
+'''
 
-showHide is a plugin that can toggle elements on a page. Also it includes some makrups options for the elements
 
 
