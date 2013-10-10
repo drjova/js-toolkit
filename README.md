@@ -22,8 +22,8 @@ The showHide plugin that can toggle elements on a page. Also it includes some ma
 }
 ```
 ##### Options Description
-       {{total}}   : Total number of items
-       {{limited}} : The number of limited items
+{{total}}   : Total number of items
+{{limited}} : The number of limited items
 
 
 #### Example
