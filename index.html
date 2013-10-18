@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Examples</title>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="assets/js/showHide.js"></script>
+        <link rel="stylesheet" type="text/css" href="assets/css/showHide.css" />
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $('.ye').showHide();
+                $('.takis').showHide({separator:';',joiner:'',markup:'<li><b><i>{{item}}</i></b></li>',wrapperMarkup:"<ul>{{items}}</ul>"});
+            })    
+        </script>
+    </head>
+    <body>
+       <h2>O ye</h2>
+        <div class="ye"><a href="">ap</a>, <a href="">vit</a>, <a href="">lamda</a>, <a href="">delta</a>, <a href=""><a href="">epsilon</a>, <a href="">zita</a>, <a href="">ita</a>, <a href="">thita</a>, <a href="">giota</a>, <a href="">kapa</a>, <a href="">lamda</a></div>
+           <hr />
+           <h2>Pali o ye</h2>
+        <div class="ye"><a href="">ap</a>, <a href="">vit</a>, <a href="">lamda</a>, <a href="">delta</a>, <a href=""><a href="">epsilon</a>, <a href="">zita</a>, <a href="">ita</a>, <a href="">thita</a>, <a href="">giota</a>, <a href="">kapa</a>, <a href="">lamda</a></div>
+        <hr />
+        <h2>O Takis</h2>
+        <div class="takis"><a href="">ap</a>; <a href="">vit</a>; <a href="">lamda</a>; <a href="">delta</a>; <a href=""><a href="">epsilon</a>; <a href="">zita</a>; <a href="">ita</a>; <a href="">thita</a>; <a href="">giota</a>; <a href="">kapa</a>; <a href="">lamda</a></div>
+        <h2>O Takis again</h2>
+        <div class="takis"><a href="">ap</a>; <a href="">vit</a></div>
+    </body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Examples</title>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+
+        <script src="assets/js/template.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function(){
+                var results = document.getElementById("results");
+                results.innerHTML = tmpl("user_tmpl", {'hello':'Hi! Harris!'});
+            })
+        </script>
+    </head>
+    <body>
+
+        <script type="text/html" id="user_tmpl">
+          <% for ( var i = 0; i < users.length; i++ ) { %>
+            <li><a href="<%=users[i].url%>"><%=users[i].name%></a></li>
+          <% } %>
+        </script>
+    </body>
+</html>
