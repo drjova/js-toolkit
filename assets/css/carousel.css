@@ -1,0 +1,106 @@
+html{
+	padding: 0;
+	margin: 0;
+	height: 100%;
+	width: 100%;
+	position: relative;
+	font-family: Helvetica;
+}
+body{
+	padding: 0;
+	margin: 0;
+	height: 100%;
+	width: 100%;
+	position: relative;
+}
+.carousel{
+	width: 100%;
+	height: 100%;
+}
+.carousel-wrapper{
+	height: 100%;
+	width: 100%;
+	background: red!important;
+}
+/* Navigation */
+.carousel-navigation{
+	position: absolute;
+	top: 40%;
+	width: 100%;
+	height: 62px;
+	left: 0;
+}
+.carousel-navigation a.carousel-navigation-arrow{
+	color: #fff;
+	text-decoration: none;
+	font-size: 45px;
+	line-height: normal;
+	opacity: 0.2;
+}
+a.carousel-navigation-arrow.carousel-navigation-back {
+	position: absolute;
+	left: 2%;
+	z-index: 20;
+
+}
+a.carousel-navigation-arrow.carousel-navigation-forth {
+	position: absolute;
+	right: 2%;
+	z-index: 20;
+
+
+}
+a.carousel-navigation-arrow.carousel-navigation-back:hover,a.carousel-navigation-arrow.carousel-navigation-forth:hover {
+	opacity: 1;
+}
+/* Controls */
+.carousel-controls{
+	position: absolute!important;
+	z-index: 20;
+	color: #fff;
+	font-size:12px;
+	width: 100%;
+	bottom: 0;
+	padding: 2px;
+}
+/* Counter */
+.carousel-counter{
+	z-index: 20;
+	position:absolute;
+	width: 100%;
+	color: #fff;
+	font-size:10px;
+	padding: 2px;
+	opacity: 0.2;
+}
+.carousel-holder{
+	position:absolute!important;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	background: black;
+	right: 0;
+	margin:auto;
+	/*width: 265px;*/
+	/*height: 200px;*/
+	width: 600px!important;
+	height: 440px!important;
+}
+.carousel-img {
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	float: left;
+	position: relative!important;
+}
+.carousel-img img{
+	position: absolute;
+	top: 0;
+	right:0;
+	left: 0;
+	bottom: 0;
+	margin:auto;
+	max-width: 100%;
+	max-height:100%;
+
+}
