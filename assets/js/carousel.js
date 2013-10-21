@@ -45,7 +45,9 @@
             base._find_previous();
             if(withClear){
                 base.clearAutoplay();
-                base.startAutoplay();
+                 if(base.$el.find('.carousel-controls').find('a').data('state') != "pause"){
+                     base.startAutoplay();
+                }
             }
             $.when(base.handleEffect('right','hide')).then(function(){
                 base.changeImage(base.$el.data("current"));
@@ -57,7 +59,10 @@
             base._find_next();
             if(withClear){
                 base.clearAutoplay();
-                base.startAutoplay();
+                if(base.$el.find('.carousel-controls').find('a').data('state') != "pause"){
+                     base.startAutoplay();
+                }
+               
             }
             $.when(base.handleEffect('left','hide')).then(function(){
                 base.changeImage(base.$el.data("current"));
@@ -113,7 +118,6 @@
             }
             $(window).resize(function() {
                  base._dicide_size();
-                 base.lazyLoad();
             });
             if(base.options.keyboardNavigation){
                 $(document).keydown(function(e){

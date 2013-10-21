@@ -1204,7 +1204,7 @@ $.overlay.registerModule('cds',{
                                 '</div>'+
                                 '<div class="cds-overlay-right">'+
                                     '<div class="cds-image-count"><div class="mfp-counter"></div></div>'+
-                                    '<div class="cds-overlay-right-content mfp-right-sidebar"><div class="mfp-title"><	/div></div>'+
+                                    '<div class="cds-overlay-right-content mfp-right-sidebar"><div class="mfp-title"></div></div>'+
                                 '<div>'+
                             '</div>'+
                           '</div>',
@@ -1372,7 +1372,6 @@ $.overlay.registerModule('cds',{
 			}
 
 			mfp._parseMarkup(template, {
-				title: 'Loading....',
 				img_replaceWith: item.img
 			}, item);
 
@@ -1398,6 +1397,7 @@ $.overlay.registerModule('cds',{
 				template.addClass('mfp-loading');
 				mfp.findImageSize(item);
 			}
+			mfp._templateEngine();
 			return template;
 		},
 		/* Helper functions */
@@ -1421,32 +1421,47 @@ $.overlay.registerModule('cds',{
 		_renderError : function(){
 
 		},
-		_templateEngine :function(template,data){
+		_templateEngine :function(){
+			setTimeout(function(){
+				$('.cds-overlay-right').html('<div data-replace="first_name"></div><div data-replace="last_name"></div><div data-replace="age"></div><div data-replace="title"></div><a href="javascript:void(0)" data-toggle="#meta" data-replace="showMeta"></a><div id="meta" data-repeat="meta"><div data-replace="key"></div><div data-replace="value"></div></div><ul data-repeat="vagos"><li><span data-replace="name"></span> | <span data-replace="last"></span></li></ul><a href="javascript:void(0)" data-toggle="#table" data-replace="showTable">Show/Hide</a><table border="1" id="table" data-repeat="vagos"><tr><td style="color:green"><div data-replace="name"></div></td><td><div data-replace="last"></div></td></tr></table><div data-logic="!caption"><div style="color:red" data-replace="caption"></div></div><div data-logic="!test"> Sorry, the test is empty </div>')
+				$('.cds-overlay-right').template({
+                    'first_name':'Harris',
+                    'last_name':'Tzovanakis',
+                    'age':23,
+                    'showMeta':'Show Meta',
+                    'showTable':'Show Table',
+                    'caption':'Meres me liakada',
+                    'test': false,
+                    'meta':[
+                        {'key':'1st Key', 'value':'1st Value'},
+                        {'key':'2nd Key', 'value':'2nd Value'},
+                        {'key':'3rd Key', 'value':'3rd Value'},
+                        {'key':'3rd Key', 'value':'3rd Value'},
+                        {'key':'3rd Key', 'value':'3rd Value'},
+                        {'key':'3rd Key', 'value':'3rd Value'},
+                        {'key':'3rd Key', 'value':'3rd Value'},
+                        {'key':'3rd Key', 'value':'3rd Value'},
+                        {'key':'3rd Key', 'value':'3rd Value'},
+                        {'key':'3rd Key', 'value':'3rd Value'},
+                        {'key':'3rd Key', 'value':'3rd Value'},
+                        {'key':'3rd Key', 'value':'3rd Value'},
+                        {'key':'3rd Key', 'value':'3rd Value'},
+                        {'key':'3rd Key', 'value':'3rd Value'},
+                        {'key':'3rd Key', 'value':'3rd Value'},
+                    ],
+                    'vagos':[
+                       {'name':'Takis','last':'Delivorias'},
+                       {'name':'Sotos','last':'Karolos'},
+                       {'name':'Zozela','last':'Papoulias'},
+                       {'name':'Flash','last':'Orestis'},
+                       {'name':'Niko','last':'TAkis'},
+                       {'name':'Parios','last':'Vasdsds'}
+                    ],
+                });
 
-			var drjova = "<div>Hi {{caption}}!</div>{{~data.sizes :key:value}}<div>{{=value}}!</div>{{~}}"
-			var regex = {
-				evaluate:    /\{\{([\s\S]+?(\}?)+)\}\}/g,
-				interpolate: /\{\{=([\s\S]+?)\}\}/g,
-				encode:      /\{\{!([\s\S]+?)\}\}/g,
-				use:         /\{\{#([\s\S]+?)\}\}/g,
-				useParams:   /(^|[^\w$])def(?:\.|\[[\'\"])([\w$\.]+)(?:[\'\"]\])?\s*\:\s*([\w$\.]+|\"[^\"]+\"|\'[^\']+\'|\{[^\}]+\})/g,
-				define:      /\{\{##\s*([\w\.$]+)\s*(\:|=)([\s\S]+?)#\}\}/g,
-				defineParams:/^\s*([\w$]+):([\s\S]+)/,
-				conditional: /\{\{\?(\?)?\s*([\s\S]*?)\s*\}\}/g,
-				iterate:     /\{\{~\s*(?:\}\}|([\s\S]+?)\s*\:\s*([\w$]+)\s*(?:\:\s*([\w$]+))?\s*\}\})/g,
-			};
-			unescape = function(code){
-				return code.replace(/\\('|\\)/g, "$1").replace(/[\r\t\n]/g, ' ');
-			}
-			var sid = 0;
-			/*return drjova*/
-			var takis = drjova.replace(regex.iterate, function(m,iterate,vname,iname) {
-				if (!iterate) return "';} } out+='";
-				sid+=1; indv=iname || "i"+sid; iterate=unescape(iterate);
-				var b = "alert('takis')"
-				return b;
-			})
-			return new Function(takis)
+
+			},1000)
+
 		 }
 	} // End of proto
 

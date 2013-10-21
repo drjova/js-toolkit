@@ -1,34 +1,85 @@
 (function($){
 
-	var cache = {};
-	this.tmpl = function tmpl(str, data){
-    // Figure out if we're getting a template, or if we need to
-    // load the template - and be sure to cache the result.
-    var fn = !/\W/.test(str) ?
-      cache[str] = cache[str] ||
-        tmpl(document.getElementById(str).innerHTML) :
+    $.template = function(el, options){
+        // To avoid scope issues, use 'base' instead of 'this'
+        // to reference this class from internal events and functions.
+        var base = this;
 
-      // Generate a reusable function that will serve as a template
-      // generator (and which will be cached).
-      new Function("obj",
-        "var p=[],print=function(){p.push.apply(p,arguments);};" +
+        // Access to jQuery and DOM versions of element
+        base.$el = $(el);
+        base.el = el;
 
-        // Introduce the data as local variables using with(){}
-        "with(obj){p.push('" +
+        // Add a reverse reference to the DOM object
+        base.$el.data("template", base);
 
-        // Convert the template into pure JavaScript
-        str
-          .replace(/[\r\t\n]/g, " ")
-          .split("<%").join("\t")
-          .replace(/((^|%>)[^\t]*)'/g, "$1\r")
-          .replace(/\t=(.*?)%>/g, "',$1,'")
-          .split("\t").join("');")
-          .split("%>").join("p.push('")
-          .split("\r").join("\\'")
-      + "');}return p.join('');");
+		base.init = function(){
+        	base.logicEngine();
+        	base.repeatEngine();
+        	base.templateEngine(base.$el,options);
+        	base.registerToggles();
 
-    // Provide some basic currying to the user
-    return data ? fn( data ) : fn;
-  };
+        };
+        base.registerToggles = function (){
+        	$(base.$el).find('[data-toggle]').each(function(dummy,el){
+        		$(this).bind('click',base.toggleEngine);
+        	});
+        }
+        base.toggleEngine = function(){
+        	$($(this).data('toggle')).toggle();
+        }
+        base.logicEngine = function(){
+        	$(base.$el).find('[data-logic]').each(function(index,el){
+        		var check = $(el).data('logic').match(/!([a-z]*)/);
+        		if(check == null){
+        			if(options[$(el).data('logic')] !== undefined)
+        				($.inArray(options[$(el).data('logic')],[false,null,'']) == -1) ? $(el).show() : $(el).hide();
+				}else{
+        			if(options[check[1]] !== undefined)
+        				($.inArray(options[check[1]],[false,null,'']) > -1) ? $(el).show() : $(el).hide();
 
+        		}
+			})
+        }
+        base.repeatEngine = function(){
+        	$(base.$el).find('[data-repeat]').each(function(index,el){
+        		// the father
+        		var $father = $(this);
+        		//children is my template for the repeated elements
+        		var children = $(el).children();
+				// Dataset for children template
+				var dataset = options[this.dataset.repeat];
+				$father.empty();
+				$.each(dataset,function(dummy,value){
+					$father.append(base.replaceEngine(children.clone(),value))
+				});
+			})
+        }
+		base.replaceEngine = function(element,dataset){
+			var $html = '';
+			$(element).each(function(dummy,el){
+				if(el.children.length > 0){
+					base.replaceEngine(el.children,dataset)
+				}else{
+					if(dataset[el.dataset.replace] !== undefined){
+						el.innerHTML = dataset[el.dataset.replace];
+					}
+				}
+			});
+			return element;
+		}
+        base.templateEngine = function(element,dataset){
+        	// Just go to every element and replace with the dataset
+            $(element).find('[data-replace]').each(function(index,el){
+                if(options[el.dataset.replace] !== undefined){
+                    el.innerHTML = options[el.dataset.replace];
+                }
+            })
+        }
+        base.init();
+    };
+	$.fn.template = function(options){
+        return this.each(function(){
+            (new $.template(this, options));
+        });
+    };
 })(jQuery);
