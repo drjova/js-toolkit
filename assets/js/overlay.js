@@ -27,9 +27,8 @@ var CLOSE_EVENT = 'Close',
 	REMOVING_CLASS = 'mfp-removing',
 	PREVENT_CLOSE_CLASS = 'mfp-prevent-close',
 	// CDS STUFF
-	CDS_OVERLAY_TEMPLATE = '<div class="overlay_wrapper">{{#has_caption}}<p class="overlay_description">{{caption}}</p>{{/has_caption}}{{#has_map}}<div style=clear:both></div><div style="width:100%;height:150px" id="map">Loading ...</div> <div style="clear:both"></div>{{/has_map}}<div style="clear:both"></div><a href="javascript:void(0)" class="open-metadata-table" onclick="$(\'.meta-table\').toggle();if($(\'.meta-table\').is(\':hidden\')){ $(this).find(\'.icon\').removeClass(\'icon-chevron-up\').addClass(\'icon-chevron-down\') }else{$(this).find(\'.icon\').removeClass(\'icon-chevron-down\').addClass(\'icon-chevron-up\')}">Photo details <span class="pull-right"><i class="icon icon-chevron-down"></i></span></a> <div style="display:none;" class="meta-table"> <table class="table">{{#meta}}<tr><td>{{meta.key}}</td><td class="textalignright">{{meta.value}}</td></tr>{{/meta}}</table> </div><div style="clear:both"></div><div class="overlay_meta_wrapper"><ul class="overlay_photo_meta">{{#has_author}}<li><span class="key">Photographer</span> <span class="value">{{{author}}}</span></li>{{/has_author}}{{#has_keywords}}<li><span class="key">Keywords</span> <span class="value keywords">{{{keywords}}}</span></li>{{/has_keywords}}</ul><div style="clear:both"></div> <div class="copyright-notice"><a href="http://copyright.web.cern.ch/" target="_blank">Conditions of Use</a> © 2013 CERN</div> </div></div>',
-
-
+	//CDS_OVERLAY_TEMPLATE = '<div class="overlay_wrapper"><div data-logic="caption"><p class="overlay_description" data-replace="caption"></p></div><div style="clear:both"></div><div data-logic="meta.location.latidute"><div style="width:100%;height:150px" id="map">Loading...</div></div><div style="clear:both"></div><a href="javascript:void(0)" class="open-metadata-table" data-callback="callbacks.details" data-toggle="#table">Photo details</a><div style="clear:both"></div><div class="meta-table" data-logic="meta"><table class="table" style="display:none" id="table" data-repeat="meta"><tr><td><div data-replace="title"></div></td><td class="textalignright"><div data-replace="value"></div></td></tr></table></div><div style="clear:both"></div><div class="overlay_meta_wrapper"><ul class="overlay_photo_meta"><li data-logic="authors"><span class="key">Photographer</span><span class="value" data-replace="authors"></span></li><li data-logic="keywords"><span class="key">Keywords</span><span class="value keywords" data-replace="keywords"></span></li></ul><div style="clear:both"></div><div class="copyright-notice"><a href="http://copyright.web.cern.ch/" target="_blank">Conditions of Use</a> © 2013 CERN</div></div></div>',
+	CDS_OVERLAY_TEMPLATE = ' <div class="overlay_wrapper"><div data-logic="caption"><p class="overlay_description" data-replace="caption"></p></div><div style="clear:both"></div><div data-logic="meta.location.latidute"><div style="width:100%;height:150px" id="map">Loading...</div></div><div style="clear:both"></div><a href="javascript:void(0)" class="open-metadata-table" data-toggle="#table">Photo details</a><div style="clear:both"></div><div class="meta-table" style="display:none" id="table"><table class="table" data-repeat="meta"><tr><td><span data-replace="title"></span></td><td class="textalignright"><span data-replace="value"></span></td></tr></table></div><div style="clear:both"></div><div class="overlay_meta_wrapper"><ul class="overlay_photo_meta"><li data-logic="authors"><span class="key">Photographer</span><span class="value" data-replace="authors"></span></li><li data-logic="keywords"><span class="key">Keywords</span><span class="value keywords" data-replace="keywords"></span></li></ul><div style="clear:both"></div><div class="copyright-notice"><a href="http://copyright.web.cern.ch/" target="_blank">Conditions of Use</a> © 2013 CERN</div></div></div>',
 	// API STUFF
 	API_IMAGE_REQUEST   = 'http://pccis55.cern.ch/media/photo',
 	API_FAKE_RESPONSE   = {
@@ -61,7 +60,9 @@ title: "Date Taken"
 },
 dimensions: {
 y: 2448,
-x: 3264
+x: 3264,
+value: "3264x2448",
+title: "Dimensions"
 },
 copyright: {
 value: "-",
@@ -89,7 +90,9 @@ title: "ISO"
 },
 location: {
 latidute: 43.741025,
-longtitude: 7.430266666666667
+longtitude: 7.430266666666667,
+value: "43.741025,7.43026666667",
+title: "Location"
 },
 model: {
 value: "iPhone 5",
@@ -1211,20 +1214,22 @@ $.overlay.registerModule('cds',{
         cursor: 'mfp-zoom-out-cur',
 		titleSrc: 'Loading ...',
 		verticalFit: true,
-		tError: '<a href="%url%">The image</a> could not be loaded.'
+		tError: '<a href="%url%">The image</a> could not be loaded.',
+		includeMap:true
 	}, // End of options
 	proto:{
 		/* Required functions */
 		initCds : function(){
-			var imgSt = mfp.st.image,
+			var cdsST = mfp.st.cds,
 			ns = '.image-cds';
 			mfp.types.push('cds');
+
 		},
 		resizeImage: function() {
 			var item = mfp.currItem;
 			if(!item || !item.img) return;
 
-			if(mfp.st.image.verticalFit) {
+			if(mfp.st.cds.verticalFit) {
 				var decr = 0;
 				if(mfp.isLowIE) {
 					decr = parseInt(item.img.css('padding-top'), 10) + parseInt(item.img.css('padding-bottom'),10);
@@ -1297,6 +1302,12 @@ $.overlay.registerModule('cds',{
 					mfp._renderData(data);
 	            },function(data){ // on error
 	            	mfp._renderData(data);
+	            	if(mfp.st.cds.includeMap){
+	            		mfp._buildMap(data);
+	            	}else{
+	            		mfp._removeMap();
+	            	}
+
 				}
 			)
             var guard = 0,
@@ -1332,14 +1343,14 @@ $.overlay.registerModule('cds',{
 						item.img.off('.mfploader');
 						if(item === mfp.currItem){
 							mfp._onImageHasSize(item);
-							mfp.updateStatus('error', imgSt.tError.replace('%url%', item.src) );
+							mfp.updateStatus('error', cdsST.tError.replace('%url%', item.src) );
 						}
 						item.hasSize = true;
 						item.loaded = true;
 						item.loadError = true;
 					}
 				},
-				imgSt = mfp.st.image;
+				cdsST = mfp.st.cds;
 			var el = template.find('.mfp-img');
 			if(el.length) {
 				var img = document.createElement('img');
@@ -1363,7 +1374,7 @@ $.overlay.registerModule('cds',{
 				if(_imgInterval) clearInterval(_imgInterval);
 				if(item.loadError) {
 					template.addClass('mfp-loading');
-					mfp.updateStatus('error', imgSt.tError.replace('%url%', item.src) );
+					mfp.updateStatus('error', cdsST.tError.replace('%url%', item.src) );
 				} else {
 					template.removeClass('mfp-loading');
 					mfp.updateStatus('ready');
@@ -1390,17 +1401,29 @@ $.overlay.registerModule('cds',{
 			return deff.promise();
 		},
 		_renderData  : function(data){
-
-			var deff = $.Deferred();
-
-
-			return deff.promise();
+			$('.cds-overlay-right-content').html($(CDS_OVERLAY_TEMPLATE).template(data));
 		},
-		_renderError 	: function(){
-
+		_buildMap 		:function(data){
+			// Second check
+			if(data.meta.location.latidute != '' && data.meta.location.longtitude !=''){
+				var baseIcon = L.icon({
+                   iconUrl: "http://leafletjs.com/dist/images/marker-icon.png",
+                   iconSize: [25, 41],
+                   shadowSize: [42, 30],
+                   iconAnchor: [12.5, 41],
+                   popupAnchor: [0, -12]
+                                   });
+                    var map = L.map('map',{ zoomControl:true }).setView([data.meta["location"]["latidute"],data.meta["location"]["longtitude"]], 15);
+                    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+                                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                                }).addTo(map);
+                    L.marker([data.meta["location"]["latidute"], data.meta["location"]["longtitude"]],{icon:baseIcon}).addTo(map)
+			}else{
+				mfp._removeMap();
+			}
 		},
-		_buildMap 		:function(){
-
+		_removeMap:function(){
+			$('#map').remove();
 		}
 	} // End of proto
 
@@ -1641,7 +1664,7 @@ $.overlay.registerModule('image', {
 				item.imgHidden = true;
 				template.addClass('mfp-loading');
 				mfp.findImageSize(item);
-			} 
+			}
 
 			return template;
 		}
