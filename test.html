@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Examples</title>
+        <script src="assets/js/jquery.min.js"></script>
+        <script src="assets/js/template.js"></script>
+        <script type="text/javascript">
+        $(document).ready(function(){
+             $('body').template({
+album: "294",
+callbacks:{
+    details:function(){
+        if($('#table').is(':hidden')){
+            $(this).removeClass('details-open');
+        }else{
+            $(this).addClass('details-open');
+        }
+    }
+},
+sizes: {
+full: "http://pccis55.cern.ch/record/295/files/IMG_0808.JPG",
+icon_700: "http://pccis55.cern.ch/record/295/files/IMG_0808.gif?subformat=icon-700",
+icon_1024: "http://pccis55.cern.ch/record/295/files/IMG_0808.gif?subformat=icon-1024",
+icon: "http://pccis55.cern.ch/record/295/files/IMG_0808.gif?subformat=icon"
+},
+collection: "PHOTO",
+caption: "A huge photo collection",
+meta: {
+FNumber: {
+value: 50,
+title: "F Number"
+},
+orientation: {
+value: "1",
+title: "Orientation"
+},
+explosure: {
+value: "1/526",
+title: "Explosure"
+},
+dateTaken: {
+    value: "2013:06:22 19:00:26",
+    title: "Date Taken"
+},
+dimensions: {
+y: 2448,
+x: 3264
+},
+copyright: {
+value: "-",
+title: "Copyright"
+},
+photographer: {
+value: "-",
+title: "Photographer"
+},
+flash: {
+value: "16",
+title: "Flash"
+},
+caption: {
+value: "-",
+title: "Caption"
+},
+camera: {
+value: "Apple",
+title: "Camera Make"
+},
+iso: {
+value: 50,
+title: "ISO"
+},
+location: {
+latidute: 43.741025,
+longtitude: 7.430266666666667
+},
+model: {
+value: "iPhone 5",
+title: "Camera Model"
+}
+},
+recID: 295,
+authors: [
+"dR jOv@"
+
+],
+keywords: [
+"justkeywords",
+"justkeywords2",
+"justkeywords3",
+"justkeyword5",
+"cern",
+"monaco",
+"f1",
+"cafe de paris"
+]
+}
+
+);
+        })
+
+        </script>
+    </head>
+    <body>
+
+             <div class="overlay_wrapper">
+                <div data-logic="caption">
+                    <p style="border-bottom:1px solid #000" class="overlay_description" data-replace="caption"></p>
+                </div>
+
+                <div style="clear:both"></div>
+
+                <div data-logic="meta.location.latidute">
+                    <div style="width:100%;height:150px" id="map">Loading...</div>
+                </div>
+
+                <div style="clear:both"></div>
+
+                <a href="javascript:void(0)" class="open-metadata-table" data-callback="callbacks.details" data-toggle="#table">Photo details</a>
+
+                <div style="clear:both"></div>
+
+                <div class="meta-table"  data-logic="meta">
+                    <table class="table" style="display:none" id="table" data-repeat="meta">
+                        <tr>
+                            <td><div data-replace="title"></div></td>
+                            <td class="textalignright"><div data-replace="value"></div></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="clear:both"></div>
+
+                <div class="overlay_meta_wrapper">
+                    <ul class="overlay_photo_meta">
+                        <li data-logic="authors">
+                            <span class="key">Photographer</span>
+                            <span class="value" data-replace="authors"></span>
+                        </li>
+                        <li data-logic="keywords">
+                            <span class="key">Keywords</span>
+                            <span class="value keywords" data-replace="keywords"></span>
+                        </li>
+                    </ul>
+
+                    <div class="copyright-notice"><a href="http://copyright.web.cern.ch/" target="_blank">Conditions of Use</a> © 2013 CERN</div>
+                </div>
+            </div>
+
+    </body>
+</html>
