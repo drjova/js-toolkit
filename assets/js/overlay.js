@@ -1209,7 +1209,7 @@ $.overlay.registerModule('cds',{
                             '</div>'+
                           '</div>',
         cursor: 'mfp-zoom-out-cur',
-		titleSrc: 'title',
+		titleSrc: 'Loading ...',
 		verticalFit: true,
 		tError: '<a href="%url%">The image</a> could not be loaded.'
 	}, // End of options
@@ -1248,16 +1248,11 @@ $.overlay.registerModule('cds',{
 				if(item.imgHidden) {
 					if(mfp.content)
 						mfp.content.removeClass('mfp-loading');
-
 					item.imgHidden = false;
 				}
 
 			}
 		},
-
-		/**
-		 * Function that loops until the image has size to display elements that rely on it asap
-		 */
 		findImageSize: function(item) {
 
 			var counter = 0,
@@ -1292,23 +1287,19 @@ $.overlay.registerModule('cds',{
 			mfpSetInterval(1);
 		},
 		getCds : function(item,template){
-			console.log(item);
 			if(mfp.st.delegate =='img'){
 				$photo_id = item.el[0].dataset.photo_id;
 			}else{
 				$photo_id = item.el[0].firstChild.dataset.photo_id;
 			}
-			$.when(mfp._requestImage($photo_id)).then(function(data){ // on success
-
-            },function(data){ // on error
- 				$.when(mfp._renderImage(data)).then(function(html){
- 					$('.cds-overlay-right-content').html(html);
- 				})
-
-            })
+			$.when(mfp._requestData($photo_id)).then(
+				function(data){ // on success
+					mfp._renderData(data);
+	            },function(data){ // on error
+	            	mfp._renderData(data);
+				}
+			)
             var guard = 0,
-
-				// image load complete handler
 				onLoadComplete = function() {
 					if(item) {
 						if (item.img[0].complete) {
@@ -1327,7 +1318,6 @@ $.overlay.registerModule('cds',{
 
 						}
 						else {
-							// if image complete check fails 200 times (20 sec), we assume that there was an error.
 							guard++;
 							if(guard < 200) {
 								setTimeout(onLoadComplete,100);
@@ -1337,8 +1327,6 @@ $.overlay.registerModule('cds',{
 						}
 					}
 				},
-
-				// image error handler
 				onLoadError = function() {
 					if(item) {
 						item.img.off('.mfploader');
@@ -1352,17 +1340,12 @@ $.overlay.registerModule('cds',{
 					}
 				},
 				imgSt = mfp.st.image;
-
-
 			var el = template.find('.mfp-img');
 			if(el.length) {
 				var img = document.createElement('img');
 				img.className = 'mfp-img';
 				item.img = $(img).on('load.mfploader', onLoadComplete).on('error.mfploader', onLoadError);
 				img.src = item.src;
-
-				// without clone() "error" event is not firing when IMG is replaced by new IMG
-				// TODO: find a way to avoid such cloning
 				if(el.is('img')) {
 					item.img = item.img.clone();
 				}
@@ -1370,16 +1353,14 @@ $.overlay.registerModule('cds',{
 					item.hasSize = true;
 				}
 			}
-
 			mfp._parseMarkup(template, {
+				title:'Loading...',
 				img_replaceWith: item.img
 			}, item);
 
 			mfp.resizeImage();
-
 			if(item.hasSize) {
 				if(_imgInterval) clearInterval(_imgInterval);
-
 				if(item.loadError) {
 					template.addClass('mfp-loading');
 					mfp.updateStatus('error', imgSt.tError.replace('%url%', item.src) );
@@ -1391,17 +1372,15 @@ $.overlay.registerModule('cds',{
 			}
 			mfp.updateStatus('loading');
 			item.loading = true;
-
 			if(!item.hasSize) {
 				item.imgHidden = true;
 				template.addClass('mfp-loading');
 				mfp.findImageSize(item);
 			}
-			mfp._templateEngine();
 			return template;
 		},
 		/* Helper functions */
-		_requestImage : function(photo_id){
+		_requestData : function(photo_id){
 			var deff = $.Deferred();
 			$.get(API_IMAGE_REQUEST,{photo_id:photo_id,metadata:'yep'},function(data){
 				deff.resolve(data);
@@ -1410,59 +1389,19 @@ $.overlay.registerModule('cds',{
 			})
 			return deff.promise();
 		},
-		_renderImage  : function(data){
-			console.log(data);
+		_renderData  : function(data){
+
 			var deff = $.Deferred();
-			var jova = mfp._templateEngine(CDS_OVERLAY_TEMPLATE,data);
-			console.log(jova);
-			deff.resolve(jova)
+
+
 			return deff.promise();
 		},
-		_renderError : function(){
+		_renderError 	: function(){
 
 		},
-		_templateEngine :function(){
-			setTimeout(function(){
-				$('.cds-overlay-right').html('<div data-replace="first_name"></div><div data-replace="last_name"></div><div data-replace="age"></div><div data-replace="title"></div><a href="javascript:void(0)" data-toggle="#meta" data-replace="showMeta"></a><div id="meta" data-repeat="meta"><div data-replace="key"></div><div data-replace="value"></div></div><ul data-repeat="vagos"><li><span data-replace="name"></span> | <span data-replace="last"></span></li></ul><a href="javascript:void(0)" data-toggle="#table" data-replace="showTable">Show/Hide</a><table border="1" id="table" data-repeat="vagos"><tr><td style="color:green"><div data-replace="name"></div></td><td><div data-replace="last"></div></td></tr></table><div data-logic="!caption"><div style="color:red" data-replace="caption"></div></div><div data-logic="!test"> Sorry, the test is empty </div>')
-				$('.cds-overlay-right').template({
-                    'first_name':'Harris',
-                    'last_name':'Tzovanakis',
-                    'age':23,
-                    'showMeta':'Show Meta',
-                    'showTable':'Show Table',
-                    'caption':'Meres me liakada',
-                    'test': false,
-                    'meta':[
-                        {'key':'1st Key', 'value':'1st Value'},
-                        {'key':'2nd Key', 'value':'2nd Value'},
-                        {'key':'3rd Key', 'value':'3rd Value'},
-                        {'key':'3rd Key', 'value':'3rd Value'},
-                        {'key':'3rd Key', 'value':'3rd Value'},
-                        {'key':'3rd Key', 'value':'3rd Value'},
-                        {'key':'3rd Key', 'value':'3rd Value'},
-                        {'key':'3rd Key', 'value':'3rd Value'},
-                        {'key':'3rd Key', 'value':'3rd Value'},
-                        {'key':'3rd Key', 'value':'3rd Value'},
-                        {'key':'3rd Key', 'value':'3rd Value'},
-                        {'key':'3rd Key', 'value':'3rd Value'},
-                        {'key':'3rd Key', 'value':'3rd Value'},
-                        {'key':'3rd Key', 'value':'3rd Value'},
-                        {'key':'3rd Key', 'value':'3rd Value'},
-                    ],
-                    'vagos':[
-                       {'name':'Takis','last':'Delivorias'},
-                       {'name':'Sotos','last':'Karolos'},
-                       {'name':'Zozela','last':'Papoulias'},
-                       {'name':'Flash','last':'Orestis'},
-                       {'name':'Niko','last':'TAkis'},
-                       {'name':'Parios','last':'Vasdsds'}
-                    ],
-                });
+		_buildMap 		:function(){
 
-
-			},1000)
-
-		 }
+		}
 	} // End of proto
 
 });

@@ -13,31 +13,42 @@
         base.$el.data("template", base);
 
 		base.init = function(){
+			// Start the engines
         	base.logicEngine();
         	base.repeatEngine();
         	base.templateEngine(base.$el,options);
-        	base.registerToggles();
 
-        };
+        	// register callbacks
+        	base.registerToggles();
+        	base.registerCallbacks();
+		};
         base.registerToggles = function (){
         	$(base.$el).find('[data-toggle]').each(function(dummy,el){
         		$(this).bind('click',base.toggleEngine);
         	});
         }
+        base.registerCallbacks = function(){
+        	$(base.$el).find('[data-callback]').each(function(dummy,el){
+        		$(this).bind('click',base.callBackEngine);
+        	});
+        }
         base.toggleEngine = function(){
-        	$($(this).data('toggle')).toggle();
+        	$(this.getAttribute('data-toggle')).toggle();
+        }
+        base.callBackEngine = function(){
+        	//console.log(base._nusty(options,this.getAttribute('data-toggle-callback')))
+        	base._nusty(options,this.getAttribute('data-callback')).call(this);
         }
         base.logicEngine = function(){
         	$(base.$el).find('[data-logic]').each(function(index,el){
-        		var check = $(el).data('logic').match(/!([a-z]*)/);
+        		var check = el.getAttribute('data-logic').match(/!([a-z]*)/);
         		if(check == null){
-        			if(options[$(el).data('logic')] !== undefined)
-        				($.inArray(options[$(el).data('logic')],[false,null,'']) == -1) ? $(el).show() : $(el).hide();
+        			if(base._nusty(options,el.getAttribute('data-logic')) !== undefined)
+        				($.inArray(base._nusty(options,el.getAttribute('data-logic')),[false,null,'',[]]) == -1) ? $(el).show() : $(el).hide();
 				}else{
         			if(options[check[1]] !== undefined)
         				($.inArray(options[check[1]],[false,null,'']) > -1) ? $(el).show() : $(el).hide();
-
-        		}
+				}
 			})
         }
         base.repeatEngine = function(){
@@ -47,7 +58,7 @@
         		//children is my template for the repeated elements
         		var children = $(el).children();
 				// Dataset for children template
-				var dataset = options[this.dataset.repeat];
+				var dataset = base._nusty(options,el.getAttribute('data-repeat'));
 				$father.empty();
 				$.each(dataset,function(dummy,value){
 					$father.append(base.replaceEngine(children.clone(),value))
@@ -55,13 +66,12 @@
 			})
         }
 		base.replaceEngine = function(element,dataset){
-			var $html = '';
 			$(element).each(function(dummy,el){
 				if(el.children.length > 0){
 					base.replaceEngine(el.children,dataset)
 				}else{
 					if(dataset[el.dataset.replace] !== undefined){
-						el.innerHTML = dataset[el.dataset.replace];
+						el.innerHTML = base._nusty(dataset,el.getAttribute('data-replace'));
 					}
 				}
 			});
@@ -70,10 +80,13 @@
         base.templateEngine = function(element,dataset){
         	// Just go to every element and replace with the dataset
             $(element).find('[data-replace]').each(function(index,el){
-                if(options[el.dataset.replace] !== undefined){
-                    el.innerHTML = options[el.dataset.replace];
-                }
+                if(base._nusty(dataset,el.getAttribute('data-replace')) !== undefined){
+                    el.innerHTML = base._nusty(dataset,el.getAttribute('data-replace'));
+				}
             })
+        }
+        base._nusty = function(data,str){
+        	 return str.split(".").reduce(function(o, x) { return o[x] }, data);
         }
         base.init();
     };

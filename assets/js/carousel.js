@@ -62,7 +62,7 @@
                 if(base.$el.find('.carousel-controls').find('a').data('state') != "pause"){
                      base.startAutoplay();
                 }
-               
+
             }
             $.when(base.handleEffect('left','hide')).then(function(){
                 base.changeImage(base.$el.data("current"));

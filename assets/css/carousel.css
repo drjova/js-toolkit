@@ -23,6 +23,21 @@ body{
 	background: red!important;
 }
 /* Navigation */
+ a.carousel-navigation-arrow.carousel-navigation-back:before {
+    content: ' ';
+    display: block;
+    width: 0;
+    height: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin-top: 35px;
+    margin-left: 35px;
+    border: medium inset transparent; 
+}
+
+
+
 .carousel-navigation{
 	position: absolute;
 	top: 40%;
@@ -37,6 +52,8 @@ body{
 	line-height: normal;
 	opacity: 0.2;
 }
+
+
 a.carousel-navigation-arrow.carousel-navigation-back {
 	position: absolute;
 	left: 2%;
