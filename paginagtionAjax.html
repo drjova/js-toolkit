@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Examples</title>
+        <script src="assets/js/jquery.min.js"></script>
+        <script src="assets/js/paginationAjax.js"></script>
+        <style>
+            body,html{
+                padding: 0;
+                margin: 0;
+            }
+            #photos img{
+                width: 60px;
+            }
+        </style>
+        <script type="text/javascript">
+            $(window).load(function(){
+                $('#photos').paginationAjax({
+                    'apiData': {
+                        'album_id':294
+                    },
+                    'onFinish':function(){
+                       
+                    }
+                });
+
+            })
+        </script>
+    </head>
+    <body>
+        <div id="photos">
+
+
+
+        </div>
+        <div style="clear:both;"></div>
+        <a href="javascript:void(0)" class="loadMore">Load More</a>
+    </body>
+</html>

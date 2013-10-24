@@ -5,31 +5,51 @@
         <script src="assets/js/jquery.min.js"></script>
         <script src="assets/js/justify.js"></script>
         <style>
+        body,html{
+            padding: 0;
+            margin: 0;
+        }
         .images{
             width:960px;
-            margin:0 auto;
+            background: #f6f6f6;
+            position: relative;
+            padding: 5px;
+
+        }
+        .images img{
+             vertical-align:bottom;
+             opacity:1;
         }
         </style>
         <script type="text/javascript">
-            $(document).ready(function(){
-                $('.images').justify({
-                    'targetHeight':220,
-                    'direction':'vertical',
-                    'allowPartialLastRow' : true
-                });
+            $(window).load(function(){
+                setTimeout(function(){
+                   var takis = $('.images').justify({
+                       'height' : 220,
+                    });
+                    //setInterval(getMore,3000)
+                   var t = setInterval(getMore,2000)
+                    setTimeout(function(){
+                        clearInterval(t)
+                    },20000)
+                },300)
+
+
+
+                function getMore(){
+                     setTimeout(function(){
+                        $.trim($('.images'));
+                        $('.images').append($.trim('<img data-photo_id="325" src="http://pccis55.cern.ch/record/325/files/IMG_0674.gif?subformat=icon" alt="Lana" /><img data-photo_id="326" src="http://pccis55.cern.ch/record/326/files/IMG_0708.gif?subformat=icon" alt="Valantis" /><img data-photo_id="327" src="http://pccis55.cern.ch/record/327/files/IMG_0697.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="328" src="http://pccis55.cern.ch/record/328/files/IMG_0830.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="329" src="http://pccis55.cern.ch/record/329/files/IMG_0741.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="330" src="http://pccis55.cern.ch/record/330/files/IMG_0787.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="331" src="http://pccis55.cern.ch/record/331/files/IMG_0769.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="332" src="http://pccis55.cern.ch/record/332/files/IMG_0751.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="333" src="http://pccis55.cern.ch/record/333/files/IMG_0856.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="334" src="http://pccis55.cern.ch/record/334/files/IMG_0776.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="335" src="http://pccis55.cern.ch/record/335/files/IMG_0745.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="336" src="http://pccis55.cern.ch/record/336/files/IMG_0838.gif?subformat=icon" alt="o ilithios" />'));
+                        setTimeout(function(){
+                            $('.images').data('justify').refresh()
+                        },300)
+
+                   },500)
+                }
             })
         </script>
     </head>
     <body>
-    <div class="images">
-
-        <img data-photo_id="295" src="http://farm9.staticflickr.com/8242/8558295633_f34a55c1c6_b.jpg" >
-        <img data-photo_id="295" src="http://farm9.staticflickr.com/8382/8558295631_0f56c1284f_b.jpg" >
-        <img data-photo_id="295" src="http://farm9.staticflickr.com/8225/8558295635_b1c5ce2794_b.jpg" >
-        <img data-photo_id="295" src="http://farm9.staticflickr.com/8383/8563475581_df05e9906d_b.jpg" >
-        <img data-photo_id="295" src="http://farm9.staticflickr.com/8235/8559402846_8b7f82e05d_b.jpg" >
-        <img data-photo_id="295" src="http://farm9.staticflickr.com/8235/8558295467_e89e95e05a_b.jpg" >
-        <img data-photo_id="295" src="http://farm9.staticflickr.com/8378/8559402848_9fcd90d20b_b.jpg" >
-
+    <div class="images effect-parent"><img data-photo_id="295" src="http://pccis55.cern.ch/record/295/files/IMG_0808.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="296" src="http://pccis55.cern.ch/record/296/files/IMG_0822.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="297" src="http://pccis55.cern.ch/record/297/files/IMG_0759.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="298" src="http://pccis55.cern.ch/record/298/files/IMG_0712.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="299" src="http://pccis55.cern.ch/record/299/files/IMG_0756.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="300" src="http://pccis55.cern.ch/record/300/files/IMG_0837.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="301" src="http://pccis55.cern.ch/record/301/files/IMG_0695.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="302" src="http://pccis55.cern.ch/record/302/files/IMG_0789.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="303" src="http://pccis55.cern.ch/record/303/files/IMG_0817.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="304" src="http://pccis55.cern.ch/record/304/files/IMG_0735.gif?subformat=icon" alt="xmm" /><img data-photo_id="305" src="http://pccis55.cern.ch/record/305/files/IMG_0847.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="306" src="http://pccis55.cern.ch/record/306/files/IMG_0785.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="307" src="http://pccis55.cern.ch/record/307/files/IMG_0663.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="308" src="http://pccis55.cern.ch/record/308/files/IMG_0770.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="309" src="http://pccis55.cern.ch/record/309/files/IMG_0707.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="310" src="http://pccis55.cern.ch/record/310/files/IMG_0788.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="311" src="http://pccis55.cern.ch/record/311/files/IMG_0836.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="312" src="http://pccis55.cern.ch/record/312/files/IMG_0664.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="313" src="http://pccis55.cern.ch/record/313/files/IMG_0705.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="314" src="http://pccis55.cern.ch/record/314/files/IMG_0772.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="315" src="http://pccis55.cern.ch/record/315/files/IMG_0753.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="316" src="http://pccis55.cern.ch/record/316/files/IMG_0794.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="317" src="http://pccis55.cern.ch/record/317/files/IMG_0660.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="318" src="http://pccis55.cern.ch/record/318/files/IMG_0767.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="319" src="http://pccis55.cern.ch/record/319/files/IMG_0693.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="320" src="http://pccis55.cern.ch/record/320/files/IMG_0783.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="321" src="http://pccis55.cern.ch/record/321/files/IMG_0744.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="322" src="http://pccis55.cern.ch/record/322/files/IMG_0717.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="323" src="http://pccis55.cern.ch/record/323/files/IMG_0711.gif?subformat=icon" alt="A huge photo collection" /><img data-photo_id="324" src="http://pccis55.cern.ch/record/324/files/IMG_0792.gif?subformat=icon" alt="vourm" /></div>
     </body>
 </html>

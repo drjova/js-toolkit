@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Examples</title>
+        <script src="assets/js/jquery.min.js"></script>
+        <script src="assets/js/template.js"></script>
+        <script src="assets/js/overlay.js"></script>
+        <script src="assets/js/context.js"></script>
+        <script type="text/javascript">
+        $(document).ready(function(){
+            $('#test').overideContext({
+                'style'  : 'tabs',
+                'source' : [
+                    {
+                        'link'  :'#href',
+                        'title' :'Links',
+                        'target': null
+                    },{
+                        'link'  :'#html',
+                        'title' :'HTML',
+                        'target': null
+                    },{
+                        'link'  :'#download',
+                        'title' :'Download',
+                        'target': null
+                    },{
+                        'link'  :'http://Google.com',
+                        'title' :'Go to google re',
+                        'target': null
+                    }
+                ]
+            });
+        })
+        </script>
+    </head>
+    <body>
+        <div id="test" style="width:300px;height:200px;ba">
+            Lorem LoremLoremLoremLoremLoremLoremLoremLoremLorem
+            LoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLorem
+            LoremLoremLoremLoremLorem
+            LoremLoremLorem
+            LoremLoremLoremLorem
+            LoremLoremLoremLorem
+        </div>
+
+        <div id="link" style="display:none;">
+            Geia sou re malaka
+            <input type="text" value="http://faeenamalaka.com" />
+        </div>
+        <div id="html" style="display:none;">
+            Ante gamisou re malaka
+            <ul>
+                <li> <a href="">dasddsadasdas</a> </li>
+                <li> <a href="">dasddsadasdas</a> </li>
+                <li> <a href="">dasddsadasdas</a> </li>
+                <li> <a href="">dasddsadasdas</a> </li>
+            </ul>
+        </div>
+        <div id="download" style="display:none;">
+           Katevase ta re pousti
+        </div>
+    </body>
+</html>

@@ -202,9 +202,7 @@
             }
         }
         base.lazyLoadDoer = function(start,end){
-            console.log(start);
-            console.log(end);
-            var deff  = $.Deferred();
+           var deff  = $.Deferred();
             $.when($.each(base.options.data.slice(start,end),function(index,photo){
                 var cacheImage = document.createElement('img');
                 cacheImage.src = photo[base.$el.data('size')];
