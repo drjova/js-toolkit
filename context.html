@@ -2,53 +2,70 @@
 <html>
     <head>
         <title>Examples</title>
+        <link rel="stylesheet" type="text/css" href="assets/css/overlay.css">
+        <link rel="stylesheet" type="text/css" href="assets/css/overideContext.css">
         <script src="assets/js/jquery.min.js"></script>
-        <script src="assets/js/template.js"></script>
+
         <script src="assets/js/overlay.js"></script>
         <script src="assets/js/context.js"></script>
+
         <script type="text/javascript">
         $(document).ready(function(){
             $('#test').overideContext({
-                'style'  : 'tabs',
-                'source' : [
-                    {
-                        'link'  :'#href',
-                        'title' :'Links',
-                        'target': null
-                    },{
-                        'link'  :'#html',
-                        'title' :'HTML',
-                        'target': null
-                    },{
-                        'link'  :'#download',
-                        'title' :'Download',
-                        'target': null
-                    },{
-                        'link'  :'http://Google.com',
-                        'title' :'Go to google re',
-                        'target': null
-                    }
+                'title'  : 'Select one option',
+                'description': 'Some description',
+                'data': [
+                      {
+                        'type'  : 'text',
+                        'class' : 'drjova-text',
+                        'source'  : {
+                            'title':'A title',
+                            'text' :'Download notice',
+                        }
+                      },{
+                        'type'   : 'list',
+                        'class'  : 'drjova-list',
+                        'source':[
+                            {
+                                'type' :'modal',
+                                'class':'drjova-grap-the-link',
+                                'href' :'#download',
+                                'title' : 'Grap the link'
+                            },
+                            {
+                                'type' :'modal',
+                                'class':'drjova-grap-the-html',
+                                'href' :'#html',
+                                'title' : 'Grap the html'
+                            },
+                            {
+                                'type' :'link',
+                                'class':'drjova-go-to-google',
+                                'href' :'http://google.com',
+                                'title' : 'Go to google',
+                                'target': '_blank'
+                            }
+                        ]
+                      },{
+                        'type'  : 'html',
+                        'class' : 'drjova-html',
+                        'source': '#aDiv'
+                      }
                 ]
             });
         })
         </script>
     </head>
     <body>
-        <div id="test" style="width:300px;height:200px;ba">
-            Lorem LoremLoremLoremLoremLoremLoremLoremLoremLorem
-            LoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLorem
-            LoremLoremLoremLoremLorem
-            LoremLoremLorem
-            LoremLoremLoremLorem
-            LoremLoremLoremLorem
+        <div id="test" style="float:left; position: relative;">
+            <img src="http://flickholdr.com/600/500/" alt="Placeholder image from flickholdr.com" />
         </div>
 
-        <div id="link" style="display:none;">
-            Geia sou re malaka
-            <input type="text" value="http://faeenamalaka.com" />
+        <div id="aDiv" class="mfp-hide oc-white">
+            <h2>Copy the image link</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas quis nisi laoreet, ornare odio a, scelerisque mauris. Maecenas vitae nisl vitae lacus fringilla auctor.</p>
         </div>
-        <div id="html" style="display:none;">
-            Ante gamisou re malaka
+        <div id="html" class="mfp-hide oc-white" >
             <ul>
                 <li> <a href="">dasddsadasdas</a> </li>
                 <li> <a href="">dasddsadasdas</a> </li>
@@ -56,8 +73,12 @@
                 <li> <a href="">dasddsadasdas</a> </li>
             </ul>
         </div>
-        <div id="download" style="display:none;">
-           Katevase ta re pousti
+        <div id="download" class="mfp-hide oc-white">
+            <h2>Copy the image link</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas quis nisi laoreet, ornare odio a, scelerisque mauris. Maecenas vitae nisl vitae lacus fringilla auctor.</p>
+            <div class="nice-input">
+            <input type="text" value="http://flickholdr.com/600/500/" />
+            </div>
         </div>
     </body>
 </html>

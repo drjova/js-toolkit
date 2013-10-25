@@ -1,0 +1,42 @@
+html,body{
+	position: relative;
+}
+.oc-menu{
+	position: absolute;
+	border:1px solid #eee;
+	background: #fff;
+	padding: 10px;
+	min-width: 100px;
+	max-width: 300px;
+}
+.oc-menu h2{
+	margin: 0;
+}
+.oc-menu p{
+	margin: 0;
+}
+.oc-white{
+	width: 600px;
+	background: #fff;
+	margin: 0 auto;
+	padding: 20px;
+	min-height: 200px;
+	position: relative;
+}
+.oc-close{
+	position: relative;
+	text-align: right;
+}
+.oc-close a{
+	right: 0px;
+	top:0px;
+	color:#666;
+	position: absolute;
+	text-decoration: none;
+	font-size:30px;
+	font-weight: bold;
+}
+.oc-close a:hover{
+	color:#333;
+
+}
