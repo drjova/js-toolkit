@@ -5,8 +5,10 @@ html,body{
 	position: absolute;
 	border:1px solid #eee;
 	background: #fff;
+	margin: auto;
 	padding: 10px;
 	min-width: 100px;
+	width: 300px;
 	max-width: 300px;
 }
 .oc-menu h2{

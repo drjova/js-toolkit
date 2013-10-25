@@ -16,7 +16,7 @@
             // Bind the overideContext to the element
             base.$el.bind("contextmenu",base.contextEngine);
             base.$el.css('position','relative');
-            $(document).bind('click',base._destroyPopup);
+            $(document).bind('mousedown',base._destroyPopup);
             base.contextParser();
             base.initalize = false;
             base.isOpen = false;
@@ -134,11 +134,13 @@
             return element;
         }
         base._destroyPopup = function(event){
-            if(!$(event.target).parents('.oc-menu').length){
-                //base.$el.find('.oc-menu').hide();
+            console.log($(event.target).parents('.oc-menu').length)
+            if($(event.target).parents('.oc-menu').length == 0){
+                base.$el.find('.oc-menu').hide();
                 base.isOpen = false;
+            }else{
+                return false;
             }
-
         }
         base._showPopup = function(){
             if(!base.initalize){
@@ -151,13 +153,14 @@
         }
         base._positionOnMouseClick = function(event){
             if(!$(event.target).parents('.oc-menu').length){
-                console.log(base.element)
-                base.element.css('top',parseInt(event.offsetY));
-                base.element.css('left',parseInt(event.offsetX));
+                base.element.css('top',parseInt(event.pageY)+'px');
+                base.element.css('left',parseInt(event.pageX)+'px');
+            }else{
+                return false;
             }
         }
         base._removeOnLinkClick = function(){
-            //base.$el.find('.oc-menu').hide();
+             base.$el.find('.oc-menu').hide();
              base.isOpen = false;
         }
         base.init();
