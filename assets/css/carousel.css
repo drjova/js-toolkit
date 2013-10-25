@@ -20,56 +20,54 @@ body{
 .carousel-wrapper{
 	height: 100%;
 	width: 100%;
-	background: red!important;
+	background: #c8c1c8!important;
 }
 /* Navigation */
- a.carousel-navigation-arrow.carousel-navigation-back:before {
-    content: ' ';
-    display: block;
-    width: 0;
-    height: 0;
-    position: absolute;
-    left: 0;
-    top: 0;
-    margin-top: 35px;
-    margin-left: 35px;
-    border: medium inset transparent; 
-}
-
-
-
 .carousel-navigation{
 	position: absolute;
 	top: 40%;
 	width: 100%;
 	height: 62px;
-	left: 0;
+	left: 0px;
 }
-.carousel-navigation a.carousel-navigation-arrow{
-	color: #fff;
-	text-decoration: none;
-	font-size: 45px;
-	line-height: normal;
-	opacity: 0.2;
+a.carousel-navigation-arrow{
+  position: absolute;
+  opacity: 0.25;
+  margin: 0;
+  top: 50%;
+  margin-top: 0;
+  padding: 0;
+  width: 90px;
+  height: 110px;
+ 
 }
-
+a.carousel-navigation-arrow:hover{
+	opacity: 0.6;
+}
 
 a.carousel-navigation-arrow.carousel-navigation-back {
 	position: absolute;
 	left: 2%;
+	width: 0; 
+	height: 0; 
+	border-top: 20px solid transparent;
+	border-bottom: 20px solid transparent; 
+	border-right:20px solid white; 
 	z-index: 20;
 
 }
 a.carousel-navigation-arrow.carousel-navigation-forth {
 	position: absolute;
 	right: 2%;
+	width: 0px;
+	height: 0px;
+	background: none;
+	border-top: 20px solid transparent;
+	border-bottom: 20px solid transparent;
+	border-left: 20px solid white;
 	z-index: 20;
-
-
 }
-a.carousel-navigation-arrow.carousel-navigation-back:hover,a.carousel-navigation-arrow.carousel-navigation-forth:hover {
-	opacity: 1;
-}
+
 /* Controls */
 .carousel-controls{
 	position: absolute!important;
@@ -80,6 +78,19 @@ a.carousel-navigation-arrow.carousel-navigation-back:hover,a.carousel-navigation
 	bottom: 0;
 	padding: 2px;
 }
+.carousel-controls:hover a{
+	opacity: 1;
+}
+.carousel-controls a{
+	text-decoration: none;
+	color: #fff;
+	opacity: 0.5;
+}
+.carousel-controls a:hover{
+	text-decoration: none;
+	color: #fff;
+	opacity: 1;
+}
 /* Counter */
 .carousel-counter{
 	z-index: 20;
@@ -88,7 +99,10 @@ a.carousel-navigation-arrow.carousel-navigation-back:hover,a.carousel-navigation
 	color: #fff;
 	font-size:10px;
 	padding: 2px;
-	opacity: 0.2;
+	opacity: 0.3;
+}
+.carousel-counter:hover{
+	opacity: 1;
 }
 .carousel-holder{
 	position:absolute!important;

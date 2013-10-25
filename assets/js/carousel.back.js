@@ -14,8 +14,7 @@
 
         base.init = function(){
             base.options = $.extend({},$.carousel.defaultOptions, options);
-            
-            base.$el.data("total", base.options.data.photos.length);
+            base.$el.data("total", base.options.data.length);
             base.$el.data("current", 0);
             base.$imageHolder = base.$el.find('.carousel-img');
             base.$carouselWrapper = base.$el.find('.carousel-wrapper');
@@ -75,9 +74,10 @@
             base.changeImage(index);
         }
         base.changeImage = function(index){
+            console.log(base.options.data[index]);
            if(base.$el.data('cache') == 'false'){
                 base.$imageHolder.html($('<img  />').attr({
-                    src: base.options.data.photos[index]['sizes'][base.$el.data('size')],
+                    src: base.options.data[index][base.$el.data('size')],
                 }))
             }else{
                  base.$imageHolder.html(base.cache[index]);
@@ -131,9 +131,11 @@
             }
             if(base.options.autoplay.pauseOnHover){
                 base.$imageHolder.find('img').mouseout(function() {
+                    console.log('Clear autoplay');
                     base.clearAutoplay();
                 }).mouseover(function() {
                     base.startAutoplay();
+                    console.log('Start autoplay');
                 });
             }
             if(base.options.showControls){
@@ -172,11 +174,11 @@
         base._dicide_size = function(){
             var bodyWidth = $('body').width();
             if(bodyWidth < 400){
-                base.$el.data('size','icon_700');
+                base.$el.data('size','image');
             }else if(bodyWidth > 1200 ){
-                base.$el.data('size','icon_1024');
+                base.$el.data('size','big');
             }else{
-                base.$el.data('size','icon_700');
+                base.$el.data('size','image');
             }
         }
         base.lazyLoadHandler = function(way){
@@ -202,9 +204,9 @@
         }
         base.lazyLoadDoer = function(start,end){
            var deff  = $.Deferred();
-            $.when($.each(base.options.data.photos.slice(start,end),function(index,photo){
+            $.when($.each(base.options.data.slice(start,end),function(index,photo){
                 var cacheImage = document.createElement('img');
-                cacheImage.src = photo.sizes[base.$el.data('size')];
+                cacheImage.src = photo[base.$el.data('size')];
                 base.cache[start+index] = cacheImage;
             })).done(function(){
                 deff.resolve();

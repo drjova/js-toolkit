@@ -19,11 +19,11 @@ var CLOSE_EVENT = 'Close',
 	MARKUP_PARSE_EVENT = 'MarkupParse',
 	OPEN_EVENT = 'Open',
 	CHANGE_EVENT = 'Change',
-	NS = 'mfp',
+	NS = 'overlay',
 	EVENT_NS = '.' + NS,
-	READY_CLASS = 'mfp-ready',
-	REMOVING_CLASS = 'mfp-removing',
-	PREVENT_CLOSE_CLASS = 'mfp-prevent-close',
+	READY_CLASS = 'overlay-ready',
+	REMOVING_CLASS = 'overlay-removing',
+	PREVENT_CLOSE_CLASS = 'overlay-prevent-close',
 	// CDS STUFF
 	CDS_OVERLAY_TEMPLATE = ' <div class="overlay_wrapper"><div data-logic="caption"><p class="overlay_description" data-replace="caption"></p></div><div style="clear:both"></div><div data-logic="meta.location.latidute"><div style="width:100%;height:150px" id="map">Loading...</div></div><div style="clear:both"></div><a href="javascript:void(0)" class="open-metadata-table" data-toggle="#table">Photo details</a><div style="clear:both"></div><div class="meta-table" style="display:none" id="table"><table class="table" data-repeat="meta"><tr><td><span data-replace="title"></span></td><td class="textalignright"><span data-replace="value"></span></td></tr></table></div><div style="clear:both"></div><div class="overlay_meta_wrapper"><ul class="overlay_photo_meta"><li data-logic="authors"><span class="key">Photographer</span><span class="value" data-replace="authors"></span></li><li data-logic="keywords"><span class="key">Keywords</span><span class="value keywords" data-replace="keywords"></span></li></ul><div style="clear:both"></div><div class="copyright-notice"><a href="http://copyright.web.cern.ch/" target="_blank">Conditions of Use</a> © 2013 CERN</div></div></div>',
 	CDS_OVERLAY_ERROR_TEMPLATE = '<div class"overlay_wrapper"><p class="muted" data-replace="message"></p></div>'
@@ -34,7 +34,7 @@ var CLOSE_EVENT = 'Close',
 /**
  * Private vars 
  */
-var mfp, // As we have only one instance of overlay object, we define it locally to not to use 'this'
+var overlay, // As we have only one instance of overlay object, we define it locally to not to use 'this'
 	overlay = function(){},
 	_isJQ = !!(window.jQuery),
 	_prevStatus,
@@ -49,12 +49,12 @@ var mfp, // As we have only one instance of overlay object, we define it locally
 /**
  * Private functions
  */
-var _mfpOn = function(name, f) {
-		mfp.ev.on(NS + name + EVENT_NS, f);
+var _overlayOn = function(name, f) {
+		overlay.ev.on(NS + name + EVENT_NS, f);
 	},
 	_getEl = function(className, appendTo, html, raw) {
 		var el = document.createElement('div');
-		el.className = 'mfp-'+className;
+		el.className = 'overlay-'+className;
 		if(html) {
 			el.innerHTML = html;
 		}
@@ -68,33 +68,33 @@ var _mfpOn = function(name, f) {
 		}
 		return el;
 	},
-	_mfpTrigger = function(e, data) {
-		mfp.ev.triggerHandler(NS + e, data);
+	_overlayTrigger = function(e, data) {
+		overlay.ev.triggerHandler(NS + e, data);
 
-		if(mfp.st.callbacks) {
-			// converts "mfpEventName" to "eventName" callback and triggers it if it's present
+		if(overlay.st.callbacks) {
+			// converts "overlayEventName" to "eventName" callback and triggers it if it's present
 			e = e.charAt(0).toLowerCase() + e.slice(1);
-			if(mfp.st.callbacks[e]) {
-				mfp.st.callbacks[e].apply(mfp, $.isArray(data) ? data : [data]);
+			if(overlay.st.callbacks[e]) {
+				overlay.st.callbacks[e].apply(overlay, $.isArray(data) ? data : [data]);
 			}
 		}
 	},
 	_setFocus = function() {
-		(mfp.st.focus ? mfp.content.find(mfp.st.focus).eq(0) : mfp.wrap).focus();
+		(overlay.st.focus ? overlay.content.find(overlay.st.focus).eq(0) : overlay.wrap).focus();
 	},
 	_getCloseBtn = function(type) {
-		if(type !== _currPopupType || !mfp.currTemplate.closeBtn) {
-			mfp.currTemplate.closeBtn = $( mfp.st.closeMarkup.replace('%title%', mfp.st.tClose ) );
+		if(type !== _currPopupType || !overlay.currTemplate.closeBtn) {
+			overlay.currTemplate.closeBtn = $( overlay.st.closeMarkup.replace('%title%', overlay.st.tClose ) );
 			_currPopupType = type;
 		}
-		return mfp.currTemplate.closeBtn;
+		return overlay.currTemplate.closeBtn;
 	},
 	// Initialize Magnific Popup only when called at least once
 	_checkInstance = function() {
 		if(!$.overlay.instance) {
-			mfp = new overlay();
-			mfp.init();
-			$.overlay.instance = mfp;
+			overlay = new overlay();
+			overlay.init();
+			$.overlay.instance = overlay;
 		}
 	},
 	// Check to close popup or not
@@ -105,20 +105,20 @@ var _mfpOn = function(name, f) {
 			return;
 		}
 
-		var closeOnContent = mfp.st.closeOnContentClick;
-		var closeOnBg = mfp.st.closeOnBgClick;
+		var closeOnContent = overlay.st.closeOnContentClick;
+		var closeOnBg = overlay.st.closeOnBgClick;
 
 		if(closeOnContent && closeOnBg) {
 			return true;
 		} else {
 
 			// We close the popup if click is on close button or on preloader. Or if there is no content.
-			if(!mfp.content || $(target).hasClass('mfp-close') || (mfp.preloader && target === mfp.preloader[0]) ) {
+			if(!overlay.content || $(target).hasClass('overlay-close') || (overlay.preloader && target === overlay.preloader[0]) ) {
 				return true;
 			}
 
 			// if click is outside the content
-			if(  (target !== mfp.content[0] && !$.contains(mfp.content[0], target))  ) {
+			if(  (target !== overlay.content[0] && !$.contains(overlay.content[0], target))  ) {
 				if(closeOnBg) {
 					// last check, if the clicked element is in DOM, (in case it's removed onclick)
 					if( $.contains(document, target) ) {
@@ -165,20 +165,20 @@ overlay.prototype = {
 	 */
 	init: function() {
 		var appVersion = navigator.appVersion;
-		mfp.isIE7 = appVersion.indexOf("MSIE 7.") !== -1; 
-		mfp.isIE8 = appVersion.indexOf("MSIE 8.") !== -1;
-		mfp.isLowIE = mfp.isIE7 || mfp.isIE8;
-		mfp.isAndroid = (/android/gi).test(appVersion);
-		mfp.isIOS = (/iphone|ipad|ipod/gi).test(appVersion);
-		mfp.supportsTransition = supportsTransitions();
+		overlay.isIE7 = appVersion.indexOf("MSIE 7.") !== -1; 
+		overlay.isIE8 = appVersion.indexOf("MSIE 8.") !== -1;
+		overlay.isLowIE = overlay.isIE7 || overlay.isIE8;
+		overlay.isAndroid = (/android/gi).test(appVersion);
+		overlay.isIOS = (/iphone|ipad|ipod/gi).test(appVersion);
+		overlay.supportsTransition = supportsTransitions();
 
 		// We disable fixed positioned lightbox on devices that don't handle it nicely.
 		// If you know a better way of detecting this - let me know.
-		mfp.probablyMobile = (mfp.isAndroid || mfp.isIOS || /(Opera Mini)|Kindle|webOS|BlackBerry|(Opera Mobi)|(Windows Phone)|IEMobile/i.test(navigator.userAgent) );
+		overlay.probablyMobile = (overlay.isAndroid || overlay.isIOS || /(Opera Mini)|Kindle|webOS|BlackBerry|(Opera Mobi)|(Windows Phone)|IEMobile/i.test(navigator.userAgent) );
 		_body = $(document.body);
 		_document = $(document);
 
-		mfp.popupsCache = {};
+		overlay.popupsCache = {};
 	},
 
 	/**
@@ -191,9 +191,9 @@ overlay.prototype = {
 
 		if(data.isObj === false) { 
 			// convert jQuery collection to array to avoid conflicts later
-			mfp.items = data.items.toArray();
+			overlay.items = data.items.toArray();
 
-			mfp.index = 0;
+			overlay.index = 0;
 			var items = data.items,
 				item;
 			for(i = 0; i < items.length; i++) {
@@ -202,72 +202,72 @@ overlay.prototype = {
 					item = item.el[0];
 				}
 				if(item === data.el[0]) {
-					mfp.index = i;
+					overlay.index = i;
 					break;
 				}
 			}
 		} else {
-			mfp.items = $.isArray(data.items) ? data.items : [data.items];
-			mfp.index = data.index || 0;
+			overlay.items = $.isArray(data.items) ? data.items : [data.items];
+			overlay.index = data.index || 0;
 		}
 
 		// if popup is already opened - we just update the content
-		if(mfp.isOpen) {
-			mfp.updateItemHTML();
+		if(overlay.isOpen) {
+			overlay.updateItemHTML();
 			return;
 		}
 		
-		mfp.types = []; 
+		overlay.types = []; 
 		_wrapClasses = '';
 		if(data.mainEl && data.mainEl.length) {
-			mfp.ev = data.mainEl.eq(0);
+			overlay.ev = data.mainEl.eq(0);
 		} else {
-			mfp.ev = _document;
+			overlay.ev = _document;
 		}
 
 		if(data.key) {
-			if(!mfp.popupsCache[data.key]) {
-				mfp.popupsCache[data.key] = {};
+			if(!overlay.popupsCache[data.key]) {
+				overlay.popupsCache[data.key] = {};
 			}
-			mfp.currTemplate = mfp.popupsCache[data.key];
+			overlay.currTemplate = overlay.popupsCache[data.key];
 		} else {
-			mfp.currTemplate = {};
+			overlay.currTemplate = {};
 		}
 
 
 
-		mfp.st = $.extend(true, {}, $.overlay.defaults, data ); 
-		mfp.fixedContentPos = mfp.st.fixedContentPos === 'auto' ? !mfp.probablyMobile : mfp.st.fixedContentPos;
+		overlay.st = $.extend(true, {}, $.overlay.defaults, data ); 
+		overlay.fixedContentPos = overlay.st.fixedContentPos === 'auto' ? !overlay.probablyMobile : overlay.st.fixedContentPos;
 
-		if(mfp.st.modal) {
-			mfp.st.closeOnContentClick = false;
-			mfp.st.closeOnBgClick = false;
-			mfp.st.showCloseBtn = false;
-			mfp.st.enableEscapeKey = false;
+		if(overlay.st.modal) {
+			overlay.st.closeOnContentClick = false;
+			overlay.st.closeOnBgClick = false;
+			overlay.st.showCloseBtn = false;
+			overlay.st.enableEscapeKey = false;
 		}
 		
 
 		// Building markup
 		// main containers are created only once
-		if(!mfp.bgOverlay) {
+		if(!overlay.bgOverlay) {
 
 			// Dark overlay
-			mfp.bgOverlay = _getEl('bg').on('click'+EVENT_NS, function() {
-				mfp.close();
+			overlay.bgOverlay = _getEl('bg').on('click'+EVENT_NS, function() {
+				overlay.close();
 			});
 
-			mfp.wrap = _getEl('wrap').attr('tabindex', -1).on('click'+EVENT_NS, function(e) {
+			overlay.wrap = _getEl('wrap').attr('tabindex', -1).on('click'+EVENT_NS, function(e) {
 				if(_checkIfClose(e.target)) {
-					mfp.close();
+					overlay.close();
 				}
 			});
 
-			mfp.container = _getEl('container', mfp.wrap);
+			overlay.container = _getEl('container', overlay.wrap);
 		}
 
-		mfp.contentContainer = _getEl('content');
-		if(mfp.st.preloader) {
-			mfp.preloader = _getEl('preloader', mfp.container, mfp.st.tLoading);
+		overlay.contentContainer = _getEl('content');
+		if(overlay.st.preloader) {
+			overlay.preloader = _getEl('preloader', overlay.container, overlay.st.tLoading);
 		}
 
 
@@ -276,43 +276,43 @@ overlay.prototype = {
 		for(i = 0; i < modules.length; i++) {
 			var n = modules[i];
 			n = n.charAt(0).toUpperCase() + n.slice(1);
-			mfp['init'+n].call(mfp);
+			overlay['init'+n].call(overlay);
 		}
-		_mfpTrigger('BeforeOpen');
+		_overlayTrigger('BeforeOpen');
 
 
-		if(mfp.st.showCloseBtn) {
+		if(overlay.st.showCloseBtn) {
 			// Close button
-			if(!mfp.st.closeBtnInside) {
-				mfp.wrap.append( _getCloseBtn() );
+			if(!overlay.st.closeBtnInside) {
+				overlay.wrap.append( _getCloseBtn() );
 			} else {
-				_mfpOn(MARKUP_PARSE_EVENT, function(e, template, values, item) {
+				_overlayOn(MARKUP_PARSE_EVENT, function(e, template, values, item) {
 					values.close_replaceWith = _getCloseBtn(item.type);
 				});
-				_wrapClasses += ' mfp-close-btn-in';
+				_wrapClasses += ' overlay-close-btn-in';
 			}
 		}
 
-		if(mfp.st.alignTop) {
-			_wrapClasses += ' mfp-align-top';
+		if(overlay.st.alignTop) {
+			_wrapClasses += ' overlay-align-top';
 		}
 
 	
 
-		if(mfp.fixedContentPos) {
-			mfp.wrap.css({
-				overflow: mfp.st.overflowY,
+		if(overlay.fixedContentPos) {
+			overlay.wrap.css({
+				overflow: overlay.st.overflowY,
 				overflowX: 'hidden',
-				overflowY: mfp.st.overflowY
+				overflowY: overlay.st.overflowY
 			});
 		} else {
-			mfp.wrap.css({ 
+			overlay.wrap.css({ 
 				top: _window.scrollTop(),
 				position: 'absolute'
 			});
 		}
-		if( mfp.st.fixedBgPos === false || (mfp.st.fixedBgPos === 'auto' && !mfp.fixedContentPos) ) {
-			mfp.bgOverlay.css({
+		if( overlay.st.fixedBgPos === false || (overlay.st.fixedBgPos === 'auto' && !overlay.fixedContentPos) ) {
+			overlay.bgOverlay.css({
 				height: _document.height(),
 				position: 'absolute'
 			});
@@ -320,45 +320,45 @@ overlay.prototype = {
 
 		
 
-		if(mfp.st.enableEscapeKey) {
+		if(overlay.st.enableEscapeKey) {
 			// Close on ESC key
 			_document.on('keyup' + EVENT_NS, function(e) {
 				if(e.keyCode === 27) {
-					mfp.close();
+					overlay.close();
 				}
 			});
 		}
 
 		_window.on('resize' + EVENT_NS, function() {
-			mfp.updateSize();
+			overlay.updateSize();
 		});
 
 
-		if(!mfp.st.closeOnContentClick) {
-			_wrapClasses += ' mfp-auto-cursor';
+		if(!overlay.st.closeOnContentClick) {
+			_wrapClasses += ' overlay-auto-cursor';
 		}
 		
 		if(_wrapClasses)
-			mfp.wrap.addClass(_wrapClasses);
+			overlay.wrap.addClass(_wrapClasses);
 
 
 		// this triggers recalculation of layout, so we get it once to not to trigger twice
-		var windowHeight = mfp.wH = _window.height();
+		var windowHeight = overlay.wH = _window.height();
 
 		
 		var windowStyles = {};
 
-		if( mfp.fixedContentPos ) {
-            if(mfp._hasScrollBar(windowHeight)){
-                var s = mfp._getScrollbarSize();
+		if( overlay.fixedContentPos ) {
+            if(overlay._hasScrollBar(windowHeight)){
+                var s = overlay._getScrollbarSize();
                 if(s) {
                     windowStyles.paddingRight = s;
                 }
             }
         }
 
-		if(mfp.fixedContentPos) {
-			if(!mfp.isIE7) {
+		if(overlay.fixedContentPos) {
+			if(!overlay.isIE7) {
 				windowStyles.overflow = 'hidden';
 			} else {
 				// ie7 double-scroll bug
@@ -368,45 +368,45 @@ overlay.prototype = {
 
 		
 		
-		var classesToadd = mfp.st.mainClass;
-		if(mfp.isIE7) {
-			classesToadd += ' mfp-ie7';
+		var classesToadd = overlay.st.mainClass;
+		if(overlay.isIE7) {
+			classesToadd += ' overlay-ie7';
 		}
 		if(classesToadd) {
-			mfp._addClassToMFP( classesToadd );
+			overlay._addClassTooverlay( classesToadd );
 		}
 
 		// add content
-		mfp.updateItemHTML();
+		overlay.updateItemHTML();
 
-		_mfpTrigger('BuildControls');
+		_overlayTrigger('BuildControls');
 
 
 		// remove scrollbar, add padding e.t.c
 		$('html').css(windowStyles);
 		
 		// add everything to DOM
-		mfp.bgOverlay.add(mfp.wrap).prependTo( document.body );
+		overlay.bgOverlay.add(overlay.wrap).prependTo( document.body );
 
 
 
 		// Save last focused element
-		mfp._lastFocusedEl = document.activeElement;
+		overlay._lastFocusedEl = document.activeElement;
 		
 		// Wait for next cycle to allow CSS transition
 		setTimeout(function() {
 			
-			if(mfp.content) {
-				mfp._addClassToMFP(READY_CLASS);
+			if(overlay.content) {
+				overlay._addClassTooverlay(READY_CLASS);
 				_setFocus();
 			} else {
 				// if content is not defined (not loaded e.t.c) we add class only for BG
-				mfp.bgOverlay.addClass(READY_CLASS);
+				overlay.bgOverlay.addClass(READY_CLASS);
 			}
 			
 			// Trap the focus in popup
 			_document.on('focusin' + EVENT_NS, function (e) {
-				if( e.target !== mfp.wrap[0] && !$.contains(mfp.wrap[0], e.target) ) {
+				if( e.target !== overlay.wrap[0] && !$.contains(overlay.wrap[0], e.target) ) {
 					_setFocus();
 					return false;
 				}
@@ -414,9 +414,9 @@ overlay.prototype = {
 
 		}, 16);
 
-		mfp.isOpen = true;
-		mfp.updateSize(windowHeight);
-		_mfpTrigger(OPEN_EVENT);
+		overlay.isOpen = true;
+		overlay.updateSize(windowHeight);
+		_overlayTrigger(OPEN_EVENT);
 
 		return data;
 	},
@@ -425,18 +425,18 @@ overlay.prototype = {
 	 * Closes the popup
 	 */
 	close: function() {
-		if(!mfp.isOpen) return;
-		_mfpTrigger(BEFORE_CLOSE_EVENT);
+		if(!overlay.isOpen) return;
+		_overlayTrigger(BEFORE_CLOSE_EVENT);
 
-		mfp.isOpen = false;
+		overlay.isOpen = false;
 		// for CSS3 animation
-		if(mfp.st.removalDelay && !mfp.isLowIE && mfp.supportsTransition )  {
-			mfp._addClassToMFP(REMOVING_CLASS);
+		if(overlay.st.removalDelay && !overlay.isLowIE && overlay.supportsTransition )  {
+			overlay._addClassTooverlay(REMOVING_CLASS);
 			setTimeout(function() {
-				mfp._close();
-			}, mfp.st.removalDelay);
+				overlay._close();
+			}, overlay.st.removalDelay);
 		} else {
-			mfp._close();
+			overlay._close();
 		}
 	},
 
@@ -444,23 +444,23 @@ overlay.prototype = {
 	 * Helper for close() function
 	 */
 	_close: function() {
-		_mfpTrigger(CLOSE_EVENT);
+		_overlayTrigger(CLOSE_EVENT);
 
 		var classesToRemove = REMOVING_CLASS + ' ' + READY_CLASS + ' ';
 
-		mfp.bgOverlay.detach();
-		mfp.wrap.detach();
-		mfp.container.empty();
+		overlay.bgOverlay.detach();
+		overlay.wrap.detach();
+		overlay.container.empty();
 
-		if(mfp.st.mainClass) {
-			classesToRemove += mfp.st.mainClass + ' ';
+		if(overlay.st.mainClass) {
+			classesToRemove += overlay.st.mainClass + ' ';
 		}
 
-		mfp._removeClassFromMFP(classesToRemove);
+		overlay._removeClassFromoverlay(classesToRemove);
 
-		if(mfp.fixedContentPos) {
+		if(overlay.fixedContentPos) {
 			var windowStyles = {paddingRight: ''};
-			if(mfp.isIE7) {
+			if(overlay.isIE7) {
 				$('body, html').css('overflow', '');
 			} else {
 				windowStyles.overflow = '';
@@ -469,49 +469,49 @@ overlay.prototype = {
 		}
 		
 		_document.off('keyup' + EVENT_NS + ' focusin' + EVENT_NS);
-		mfp.ev.off(EVENT_NS);
+		overlay.ev.off(EVENT_NS);
 
 		// clean up DOM elements that aren't removed
-		mfp.wrap.attr('class', 'mfp-wrap').removeAttr('style');
-		mfp.bgOverlay.attr('class', 'mfp-bg');
-		mfp.container.attr('class', 'mfp-container');
+		overlay.wrap.attr('class', 'overlay-wrap').removeAttr('style');
+		overlay.bgOverlay.attr('class', 'overlay-bg');
+		overlay.container.attr('class', 'overlay-container');
 
 		// remove close button from target element
-		if(mfp.st.showCloseBtn &&
-		(!mfp.st.closeBtnInside || mfp.currTemplate[mfp.currItem.type] === true)) {
-			if(mfp.currTemplate.closeBtn)
-				mfp.currTemplate.closeBtn.detach();
+		if(overlay.st.showCloseBtn &&
+		(!overlay.st.closeBtnInside || overlay.currTemplate[overlay.currItem.type] === true)) {
+			if(overlay.currTemplate.closeBtn)
+				overlay.currTemplate.closeBtn.detach();
 		}
 
 
-		if(mfp._lastFocusedEl) {
-			$(mfp._lastFocusedEl).focus(); // put tab focus back
+		if(overlay._lastFocusedEl) {
+			$(overlay._lastFocusedEl).focus(); // put tab focus back
 		}
-		mfp.currItem = null;	
-		mfp.content = null;
-		mfp.currTemplate = null;
-		mfp.prevHeight = 0;
+		overlay.currItem = null;	
+		overlay.content = null;
+		overlay.currTemplate = null;
+		overlay.prevHeight = 0;
 
-		_mfpTrigger(AFTER_CLOSE_EVENT);
+		_overlayTrigger(AFTER_CLOSE_EVENT);
 	},
 	
 	updateSize: function(winHeight) {
 
-		if(mfp.isIOS) {
+		if(overlay.isIOS) {
 			// fixes iOS nav bars https://github.com/dimsemenov/Magnific-Popup/issues/2
 			var zoomLevel = document.documentElement.clientWidth / window.innerWidth;
 			var height = window.innerHeight * zoomLevel;
-			mfp.wrap.css('height', height);
-			mfp.wH = height;
+			overlay.wrap.css('height', height);
+			overlay.wH = height;
 		} else {
-			mfp.wH = winHeight || _window.height();
+			overlay.wH = winHeight || _window.height();
 		}
 		// Fixes #84: popup incorrectly positioned with position:relative on body
-		if(!mfp.fixedContentPos) {
-			mfp.wrap.css('height', mfp.wH);
+		if(!overlay.fixedContentPos) {
+			overlay.wrap.css('height', overlay.wH);
 		}
 
-		_mfpTrigger('Resize');
+		_overlayTrigger('Resize');
 
 	},
 
@@ -519,60 +519,60 @@ overlay.prototype = {
 	 * Set content of popup based on current index
 	 */
 	updateItemHTML: function() {
-		var item = mfp.items[mfp.index];
+		var item = overlay.items[overlay.index];
 
 		// Detach and perform modifications
-		mfp.contentContainer.detach();
+		overlay.contentContainer.detach();
 
-		if(mfp.content)
-			mfp.content.detach();
+		if(overlay.content)
+			overlay.content.detach();
 
 		if(!item.parsed) {
-			item = mfp.parseEl( mfp.index );
+			item = overlay.parseEl( overlay.index );
 		}
 
 		var type = item.type;	
 
-		_mfpTrigger('BeforeChange', [mfp.currItem ? mfp.currItem.type : '', type]);
+		_overlayTrigger('BeforeChange', [overlay.currItem ? overlay.currItem.type : '', type]);
 		// BeforeChange event works like so:
-		// _mfpOn('BeforeChange', function(e, prevType, newType) { });
+		// _overlayOn('BeforeChange', function(e, prevType, newType) { });
 		
-		mfp.currItem = item;
+		overlay.currItem = item;
 
 		
 
 		
 
-		if(!mfp.currTemplate[type]) {
-			var markup = mfp.st[type] ? mfp.st[type].markup : false;
+		if(!overlay.currTemplate[type]) {
+			var markup = overlay.st[type] ? overlay.st[type].markup : false;
 
 			// allows to modify markup
-			_mfpTrigger('FirstMarkupParse', markup);
+			_overlayTrigger('FirstMarkupParse', markup);
 
 			if(markup) {
-				mfp.currTemplate[type] = $(markup);
+				overlay.currTemplate[type] = $(markup);
 			} else {
 				// if there is no markup found we just define that template is parsed
-				mfp.currTemplate[type] = true;
+				overlay.currTemplate[type] = true;
 			}
 		}
 
 		if(_prevContentType && _prevContentType !== item.type) {
-			mfp.container.removeClass('mfp-'+_prevContentType+'-holder');
+			overlay.container.removeClass('overlay-'+_prevContentType+'-holder');
 		}
 		
-		var newContent = mfp['get' + type.charAt(0).toUpperCase() + type.slice(1)](item, mfp.currTemplate[type]);
-		mfp.appendContent(newContent, type);
+		var newContent = overlay['get' + type.charAt(0).toUpperCase() + type.slice(1)](item, overlay.currTemplate[type]);
+		overlay.appendContent(newContent, type);
 
 		item.preloaded = true;
 
-		_mfpTrigger(CHANGE_EVENT, item);
+		_overlayTrigger(CHANGE_EVENT, item);
 		_prevContentType = item.type;
 		
 		// Append container back after its content changed
-		mfp.container.prepend(mfp.contentContainer);
+		overlay.container.prepend(overlay.contentContainer);
 
-		_mfpTrigger('AfterChange');
+		_overlayTrigger('AfterChange');
 	},
 
 
@@ -580,26 +580,26 @@ overlay.prototype = {
 	 * Set HTML content of popup
 	 */
 	appendContent: function(newContent, type) {
-		mfp.content = newContent;
+		overlay.content = newContent;
 		
 		if(newContent) {
-			if(mfp.st.showCloseBtn && mfp.st.closeBtnInside &&
-				mfp.currTemplate[type] === true) {
+			if(overlay.st.showCloseBtn && overlay.st.closeBtnInside &&
+				overlay.currTemplate[type] === true) {
 				// if there is no markup, we just append close button element inside
-				if(!mfp.content.find('.mfp-close').length) {
-					mfp.content.append(_getCloseBtn());
+				if(!overlay.content.find('.overlay-close').length) {
+					overlay.content.append(_getCloseBtn());
 				}
 			} else {
-				mfp.content = newContent;
+				overlay.content = newContent;
 			}
 		} else {
-			mfp.content = '';
+			overlay.content = '';
 		}
 
-		_mfpTrigger(BEFORE_APPEND_EVENT);
-		mfp.container.addClass('mfp-'+type+'-holder');
+		_overlayTrigger(BEFORE_APPEND_EVENT);
+		overlay.container.addClass('overlay-'+type+'-holder');
 
-		mfp.contentContainer.append(mfp.content);
+		overlay.contentContainer.append(overlay.content);
 	},
 
 
@@ -610,7 +610,7 @@ overlay.prototype = {
 	 * @param  {int} index Index of item to parse
 	 */
 	parseEl: function(index) {
-		var item = mfp.items[index],
+		var item = overlay.items[index],
 			type = item.type;
 
 		if(item.tagName) {
@@ -620,29 +620,29 @@ overlay.prototype = {
 		}
 
 		if(item.el) {
-			var types = mfp.types;
+			var types = overlay.types;
 
-			// check for 'mfp-TYPE' class
+			// check for 'overlay-TYPE' class
 			for(var i = 0; i < types.length; i++) {
-				if( item.el.hasClass('mfp-'+types[i]) ) {
+				if( item.el.hasClass('overlay-'+types[i]) ) {
 					type = types[i];
 					break;
 				}
 			}
 
-			item.src = item.el.attr('data-mfp-src');
+			item.src = item.el.attr('data-overlay-src');
 			if(!item.src) {
 				item.src = item.el.attr('href');
 			}
 		}
 
-		item.type = type || mfp.st.type || 'inline';
+		item.type = type || overlay.st.type || 'inline';
 		item.index = index;
 		item.parsed = true;
-		mfp.items[index] = item;
-		_mfpTrigger('ElementParse', item);
+		overlay.items[index] = item;
+		_overlayTrigger('ElementParse', item);
 
-		return mfp.items[index];
+		return overlay.items[index];
 	},
 
 
@@ -651,8 +651,8 @@ overlay.prototype = {
 	 */
 	addGroup: function(el, options) {
 		var eHandler = function(e) {
-			e.mfpEl = this;
-			mfp._openClick(e, el, options);
+			e.overlayEl = this;
+			overlay._openClick(e, el, options);
 		};
 
 		if(!options) {
@@ -687,7 +687,7 @@ overlay.prototype = {
 
 		if(disableOn) {
 			if($.isFunction(disableOn)) {
-				if( !disableOn.call(mfp) ) {
+				if( !disableOn.call(overlay) ) {
 					return true;
 				}
 			} else { // else it's number
@@ -701,17 +701,17 @@ overlay.prototype = {
 			e.preventDefault();
 
 			// This will prevent popup from closing if element is inside and popup is already opened
-			if(mfp.isOpen) {
+			if(overlay.isOpen) {
 				e.stopPropagation();
 			}
 		}
 			
 
-		options.el = $(e.mfpEl);
+		options.el = $(e.overlayEl);
 		if(options.delegate) {
 			options.items = el.find(options.delegate);
 		}
-		mfp.open(options);
+		overlay.open(options);
 	},
 
 
@@ -720,13 +720,13 @@ overlay.prototype = {
 	 */
 	updateStatus: function(status, text) {
 
-		if(mfp.preloader) {
+		if(overlay.preloader) {
 			if(_prevStatus !== status) {
-				mfp.container.removeClass('mfp-s-'+_prevStatus);
+				overlay.container.removeClass('overlay-s-'+_prevStatus);
 			}
 
 			if(!text && status === 'loading') {
-				text = mfp.st.tLoading;
+				text = overlay.st.tLoading;
 			}
 
 			var data = {
@@ -734,18 +734,18 @@ overlay.prototype = {
 				text: text
 			};
 			// allows to modify status
-			_mfpTrigger('UpdateStatus', data);
+			_overlayTrigger('UpdateStatus', data);
 
 			status = data.status;
 			text = data.text;
 
-			mfp.preloader.html(text);
+			overlay.preloader.html(text);
 
-			mfp.preloader.find('a').on('click', function(e) {
+			overlay.preloader.find('a').on('click', function(e) {
 				e.stopImmediatePropagation();
 			});
 
-			mfp.container.addClass('mfp-s-'+status);
+			overlay.container.addClass('overlay-s-'+status);
 			_prevStatus = status;
 		}
 	},
@@ -754,16 +754,16 @@ overlay.prototype = {
 	/*
 		"Private" helpers that aren't private at all
 	 */
-	_addClassToMFP: function(cName) {
-		mfp.bgOverlay.addClass(cName);
-		mfp.wrap.addClass(cName);
+	_addClassTooverlay: function(cName) {
+		overlay.bgOverlay.addClass(cName);
+		overlay.wrap.addClass(cName);
 	},
-	_removeClassFromMFP: function(cName) {
+	_removeClassFromoverlay: function(cName) {
 		this.bgOverlay.removeClass(cName);
-		mfp.wrap.removeClass(cName);
+		overlay.wrap.removeClass(cName);
 	},
 	_hasScrollBar: function(winHeight) {
-		return (  (mfp.isIE7 ? _document.height() : document.body.scrollHeight) > (winHeight || _window.height()) );
+		return (  (overlay.isIE7 ? _document.height() : document.body.scrollHeight) > (winHeight || _window.height()) );
 	},
 	_parseMarkup: function(template, values, item) {
 
@@ -771,7 +771,7 @@ overlay.prototype = {
 		if(item.data) {
 			values = $.extend(item.data, values);
 		}
-		_mfpTrigger(MARKUP_PARSE_EVENT, [template, values, item] );
+		_overlayTrigger(MARKUP_PARSE_EVENT, [template, values, item] );
 
 		$.each(values, function(key, value) {
 			if(value === undefined || value === false) {
@@ -806,15 +806,15 @@ overlay.prototype = {
 
 	_getScrollbarSize: function() {
 		// thx David
-		if(mfp.scrollbarSize === undefined) {
+		if(overlay.scrollbarSize === undefined) {
 			var scrollDiv = document.createElement("div");
-			scrollDiv.id = "mfp-sbm";
+			scrollDiv.id = "overlay-sbm";
 			scrollDiv.style.cssText = 'width: 99px; height: 99px; overflow: scroll; position: absolute; top: -9999px;';
 			document.body.appendChild(scrollDiv);
-			mfp.scrollbarSize = scrollDiv.offsetWidth - scrollDiv.clientWidth;
+			overlay.scrollbarSize = scrollDiv.offsetWidth - scrollDiv.clientWidth;
 			document.body.removeChild(scrollDiv);
 		}
-		return mfp.scrollbarSize;
+		return overlay.scrollbarSize;
 	}
 
 }; /* overlay core prototype end */
@@ -894,7 +894,7 @@ $.overlay = {
 
 		overflowY: 'auto',
 
-		closeMarkup: '<button title="%title%" type="button" class="mfp-close">&times;</button>',
+		closeMarkup: '<button title="%title%" type="button" class="overlay-close">&times;</button>',
 
 		tClose: 'Close (Esc)',
 
@@ -927,10 +927,10 @@ $.fn.overlay = function(options) {
 				}
 				items = items.eq( index );
 			}
-			mfp._openClick({mfpEl:items}, jqEl, itemOpts);
+			overlay._openClick({overlayEl:items}, jqEl, itemOpts);
 		} else {
-			if(mfp.isOpen)
-				mfp[options].apply(mfp, Array.prototype.slice.call(arguments, 1));
+			if(overlay.isOpen)
+				overlay[options].apply(overlay, Array.prototype.slice.call(arguments, 1));
 		}
 
 	} else {
@@ -948,7 +948,7 @@ $.fn.overlay = function(options) {
 			jqEl[0].overlay = options;
 		}
 
-		mfp.addGroup(jqEl, options);
+		overlay.addGroup(jqEl, options);
 
 	}
 	return jqEl;
@@ -971,16 +971,16 @@ var INLINE_NS = 'inline',
 
 $.overlay.registerModule(INLINE_NS, {
 	options: {
-		hiddenClass: 'hide', // will be appended with `mfp-` prefix
+		hiddenClass: 'hide', // will be appended with `overlay-` prefix
 		markup: '',
 		tNotFound: 'Content not found'
 	},
 	proto: {
 
 		initInline: function() {
-			mfp.types.push(INLINE_NS);
+			overlay.types.push(INLINE_NS);
 
-			_mfpOn(CLOSE_EVENT+'.'+INLINE_NS, function() {
+			_overlayOn(CLOSE_EVENT+'.'+INLINE_NS, function() {
 				_putInlineElementsBack();
 			});
 		},
@@ -990,7 +990,7 @@ $.overlay.registerModule(INLINE_NS, {
 			_putInlineElementsBack();
 
 			if(item.src) {
-				var inlineSt = mfp.st.inline,
+				var inlineSt = overlay.st.inline,
 					el = $(item.src);
 
 				if(el.length) {
@@ -1001,15 +1001,15 @@ $.overlay.registerModule(INLINE_NS, {
 						if(!_inlinePlaceholder) {
 							_hiddenClass = inlineSt.hiddenClass;
 							_inlinePlaceholder = _getEl(_hiddenClass);
-							_hiddenClass = 'mfp-'+_hiddenClass;
+							_hiddenClass = 'overlay-'+_hiddenClass;
 						}
 						// replace target inline element with placeholder
 						_lastInlineElement = el.after(_inlinePlaceholder).detach().removeClass(_hiddenClass);
 					}
 
-					mfp.updateStatus('ready');
+					overlay.updateStatus('ready');
 				} else {
-					mfp.updateStatus('error', inlineSt.tNotFound);
+					overlay.updateStatus('error', inlineSt.tNotFound);
 					el = $('<div>');
 				}
 
@@ -1017,8 +1017,8 @@ $.overlay.registerModule(INLINE_NS, {
 				return el;
 			}
 
-			mfp.updateStatus('ready');
-			mfp._parseMarkup(template, {}, item);
+			overlay.updateStatus('ready');
+			overlay._parseMarkup(template, {}, item);
 			return template;
 		}
 	}
@@ -1034,23 +1034,23 @@ $.overlay.registerModule('cds',{
 	options:{
 		markup: '<div class="cds-overlay-wrapper">'+
                             '<div class="cds-overlay-close">'+
-                                '<div class="mfp-close"></div>'+
+                                '<div class="overlay-close"></div>'+
                             '</div>'+
                             '<div class="cds-overlay-content">'+
                                 '<div class="cds-overlay-left">'+
                                     '<div class="cds-overlay-fake-table">'+
                                         '<div class="cds-overlay-fake-table-cell">'+
-                                            '<div class="mfp-img"></div>' +
+                                            '<div class="overlay-img"></div>' +
                                         '</div>'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="cds-overlay-right">'+
-                                    '<div class="cds-image-count"><div class="mfp-counter"></div></div>'+
-                                    '<div class="cds-overlay-right-content mfp-right-sidebar"><div class="mfp-title"></div></div>'+
+                                    '<div class="cds-image-count"><div class="overlay-counter"></div></div>'+
+                                    '<div class="cds-overlay-right-content overlay-right-sidebar"><div class="overlay-title"></div></div>'+
                                 '<div>'+
                             '</div>'+
                           '</div>',
-        cursor: 'mfp-zoom-out-cur',
+        cursor: 'overlay-zoom-out-cur',
 		titleSrc: 'Loading ...',
 		verticalFit: true,
 		tError: '<a href="%url%">The image</a> could not be loaded.',
@@ -1059,21 +1059,21 @@ $.overlay.registerModule('cds',{
 	proto:{
 		/* Required functions */
 		initCds : function(){
-			var cdsST = mfp.st.cds,
+			var cdsST = overlay.st.cds,
 			ns = '.image-cds';
-			mfp.types.push('cds');
+			overlay.types.push('cds');
 
 		},
 		resizeImage: function() {
-			var item = mfp.currItem;
+			var item = overlay.currItem;
 			if(!item || !item.img) return;
 
-			if(mfp.st.cds.verticalFit) {
+			if(overlay.st.cds.verticalFit) {
 				var decr = 0;
-				if(mfp.isLowIE) {
+				if(overlay.isLowIE) {
 					decr = parseInt(item.img.css('padding-top'), 10) + parseInt(item.img.css('padding-bottom'),10);
 				}
-				item.img.css('max-height', mfp.wH-decr);
+				item.img.css('max-height', overlay.wH-decr);
 			}
 		},
 		_onImageHasSize: function(item) {
@@ -1087,11 +1087,11 @@ $.overlay.registerModule('cds',{
 
 				item.isCheckingImgSize = false;
 
-				_mfpTrigger('ImageHasSize', item);
+				_overlayTrigger('ImageHasSize', item);
 
 				if(item.imgHidden) {
-					if(mfp.content)
-						mfp.content.removeClass('mfp-loading');
+					if(overlay.content)
+						overlay.content.removeClass('overlay-loading');
 					item.imgHidden = false;
 				}
 
@@ -1101,7 +1101,7 @@ $.overlay.registerModule('cds',{
 
 			var counter = 0,
 				img = item.img[0],
-				mfpSetInterval = function(delay) {
+				overlaySetInterval = function(delay) {
 
 					if(_imgInterval) {
 						clearInterval(_cdsInterval);
@@ -1109,7 +1109,7 @@ $.overlay.registerModule('cds',{
 					// decelerating interval that checks for size of an image
 					_cdsInterval = setInterval(function() {
 						if(img.naturalWidth > 0) {
-							mfp._onImageHasSize(item);
+							overlay._onImageHasSize(item);
 							return;
 						}
 
@@ -1119,34 +1119,34 @@ $.overlay.registerModule('cds',{
 
 						counter++;
 						if(counter === 3) {
-							mfpSetInterval(10);
+							overlaySetInterval(10);
 						} else if(counter === 40) {
-							mfpSetInterval(50);
+							overlaySetInterval(50);
 						} else if(counter === 100) {
-							mfpSetInterval(500);
+							overlaySetInterval(500);
 						}
 					}, delay);
 				};
 
-			mfpSetInterval(1);
+			overlaySetInterval(1);
 		},
 		getCds : function(item,template){
-			if(mfp.st.delegate =='img'){
+			if(overlay.st.delegate =='img'){
 				$photo_id = item.el[0].dataset.photo_id;
 			}else{
 				$photo_id = item.el[0].firstChild.dataset.photo_id;
 			}
-			$.when(mfp._requestData($photo_id)).then(
+			$.when(overlay._requestData($photo_id)).then(
 				function(data){ // on success
 					data = $.parseJSON(data);
-					mfp._renderData(data);
-					if(mfp.st.cds.includeMap){
-						mfp._buildMap(data);
+					overlay._renderData(data);
+					if(overlay.st.cds.includeMap){
+						overlay._buildMap(data);
 					}else{
-	            		mfp._removeMap();
+	            		overlay._removeMap();
 	            	}
 	            },function(data){ // on error
-	            	mfp._renderError();
+	            	overlay._renderError();
 
 	            }
 			)
@@ -1154,18 +1154,18 @@ $.overlay.registerModule('cds',{
 				onLoadComplete = function() {
 					if(item) {
 						if (item.img[0].complete) {
-							item.img.off('.mfploader');
+							item.img.off('.overlayloader');
 
-							if(item === mfp.currItem){
-								mfp._onImageHasSize(item);
+							if(item === overlay.currItem){
+								overlay._onImageHasSize(item);
 
-								mfp.updateStatus('ready');
+								overlay.updateStatus('ready');
 							}
 
 							item.hasSize = true;
 							item.loaded = true;
 
-							_mfpTrigger('ImageLoadComplete');
+							_overlayTrigger('ImageLoadComplete');
 
 						}
 						else {
@@ -1180,22 +1180,22 @@ $.overlay.registerModule('cds',{
 				},
 				onLoadError = function() {
 					if(item) {
-						item.img.off('.mfploader');
-						if(item === mfp.currItem){
-							mfp._onImageHasSize(item);
-							mfp.updateStatus('error', cdsST.tError.replace('%url%', item.src) );
+						item.img.off('.overlayloader');
+						if(item === overlay.currItem){
+							overlay._onImageHasSize(item);
+							overlay.updateStatus('error', cdsST.tError.replace('%url%', item.src) );
 						}
 						item.hasSize = true;
 						item.loaded = true;
 						item.loadError = true;
 					}
 				},
-				cdsST = mfp.st.cds;
-			var el = template.find('.mfp-img');
+				cdsST = overlay.st.cds;
+			var el = template.find('.overlay-img');
 			if(el.length) {
 				var img = document.createElement('img');
-				img.className = 'mfp-img';
-				item.img = $(img).on('load.mfploader', onLoadComplete).on('error.mfploader', onLoadError);
+				img.className = 'overlay-img';
+				item.img = $(img).on('load.overlayloader', onLoadComplete).on('error.overlayloader', onLoadError);
 				img.src = item.src;
 				if(el.is('img')) {
 					item.img = item.img.clone();
@@ -1204,29 +1204,29 @@ $.overlay.registerModule('cds',{
 					item.hasSize = true;
 				}
 			}
-			mfp._parseMarkup(template, {
+			overlay._parseMarkup(template, {
 				title:'Loading...',
 				img_replaceWith: item.img
 			}, item);
 
-			mfp.resizeImage();
+			overlay.resizeImage();
 			if(item.hasSize) {
 				if(_imgInterval) clearInterval(_imgInterval);
 				if(item.loadError) {
-					template.addClass('mfp-loading');
-					mfp.updateStatus('error', cdsST.tError.replace('%url%', item.src) );
+					template.addClass('overlay-loading');
+					overlay.updateStatus('error', cdsST.tError.replace('%url%', item.src) );
 				} else {
-					template.removeClass('mfp-loading');
-					mfp.updateStatus('ready');
+					template.removeClass('overlay-loading');
+					overlay.updateStatus('ready');
 				}
 				return template;
 			}
-			mfp.updateStatus('loading');
+			overlay.updateStatus('loading');
 			item.loading = true;
 			if(!item.hasSize) {
 				item.imgHidden = true;
-				template.addClass('mfp-loading');
-				mfp.findImageSize(item);
+				template.addClass('overlay-loading');
+				overlay.findImageSize(item);
 			}
 			return template;
 		},
@@ -1264,7 +1264,7 @@ $.overlay.registerModule('cds',{
                                 }).addTo(map);
                     L.marker([data.meta["location"]["latidute"], data.meta["location"]["longtitude"]],{icon:baseIcon}).addTo(map)
 			}else{
-				mfp._removeMap();
+				overlay._removeMap();
 			}
 		},
 		_removeMap:function(){
@@ -1282,7 +1282,7 @@ $.overlay.registerModule('cds',{
  * Get looped index depending on number of slides
  */
 var _getLoopedId = function(index) {
-		var numSlides = mfp.items.length;
+		var numSlides = overlay.items.length;
 		if(index > numSlides - 1) {
 			return index - numSlides;
 		} else  if(index < 0) {
@@ -1298,7 +1298,7 @@ $.overlay.registerModule('gallery', {
 
 	options: {
 		enabled: false,
-		arrowMarkup: '<button title="%title%" type="button" class="mfp-arrow mfp-arrow-%dir%"></button>',
+		arrowMarkup: '<button title="%title%" type="button" class="overlay-arrow overlay-arrow-%dir%"></button>',
 		preload: [0,2],
 		navigateByImgClick: true,
 		arrows: true,
@@ -1311,21 +1311,21 @@ $.overlay.registerModule('gallery', {
 	proto: {
 		initGallery: function() {
 
-			var gSt = mfp.st.gallery,
-				ns = '.mfp-gallery',
-				supportsFastClick = Boolean($.fn.mfpFastClick);
+			var gSt = overlay.st.gallery,
+				ns = '.overlay-gallery',
+				supportsFastClick = Boolean($.fn.overlayFastClick);
 
-			mfp.direction = true; // true - next, false - prev
+			overlay.direction = true; // true - next, false - prev
 			if(!gSt || !gSt.enabled ) return false;
 
-			_wrapClasses += ' mfp-gallery';
+			_wrapClasses += ' overlay-gallery';
 
-			_mfpOn(OPEN_EVENT+ns, function() {
+			_overlayOn(OPEN_EVENT+ns, function() {
 
 				if(gSt.navigateByImgClick) {
-					mfp.wrap.on('click'+ns, '.mfp-img', function() {
-						if(mfp.items.length > 1) {
-							mfp.next();
+					overlay.wrap.on('click'+ns, '.overlay-img', function() {
+						if(overlay.items.length > 1) {
+							overlay.next();
 							return false;
 						}
 					});
@@ -1333,120 +1333,120 @@ $.overlay.registerModule('gallery', {
 
 				_document.on('keydown'+ns, function(e) {
 					if (e.keyCode === 37) {
-						mfp.prev();
+						overlay.prev();
 					} else if (e.keyCode === 39) {
-						mfp.next();
+						overlay.next();
 					}
 				});
 			});
 
-			_mfpOn('UpdateStatus'+ns, function(e, data) {
+			_overlayOn('UpdateStatus'+ns, function(e, data) {
 				if(data.text) {
-					data.text = _replaceCurrTotal(data.text, mfp.currItem.index, mfp.items.length);
+					data.text = _replaceCurrTotal(data.text, overlay.currItem.index, overlay.items.length);
 				}
 			});
 
-			_mfpOn(MARKUP_PARSE_EVENT+ns, function(e, element, values, item) {
-				var l = mfp.items.length;
+			_overlayOn(MARKUP_PARSE_EVENT+ns, function(e, element, values, item) {
+				var l = overlay.items.length;
 				values.counter = l > 1 ? _replaceCurrTotal(gSt.tCounter, item.index, l) : '';
 			});
 
-			_mfpOn('BuildControls' + ns, function() {
-				if(mfp.items.length > 1 && gSt.arrows && !mfp.arrowLeft) {
+			_overlayOn('BuildControls' + ns, function() {
+				if(overlay.items.length > 1 && gSt.arrows && !overlay.arrowLeft) {
 					var markup = gSt.arrowMarkup,
-						arrowLeft = mfp.arrowLeft = $( markup.replace(/%title%/gi, gSt.tPrev).replace(/%dir%/gi, 'left') ).addClass(PREVENT_CLOSE_CLASS),			
-						arrowRight = mfp.arrowRight = $( markup.replace(/%title%/gi, gSt.tNext).replace(/%dir%/gi, 'right') ).addClass(PREVENT_CLOSE_CLASS);
+						arrowLeft = overlay.arrowLeft = $( markup.replace(/%title%/gi, gSt.tPrev).replace(/%dir%/gi, 'left') ).addClass(PREVENT_CLOSE_CLASS),			
+						arrowRight = overlay.arrowRight = $( markup.replace(/%title%/gi, gSt.tNext).replace(/%dir%/gi, 'right') ).addClass(PREVENT_CLOSE_CLASS);
 
-					var eName = supportsFastClick ? 'mfpFastClick' : 'click';
+					var eName = supportsFastClick ? 'overlayFastClick' : 'click';
 					arrowLeft[eName](function() {
-						mfp.prev();
+						overlay.prev();
 					});			
 					arrowRight[eName](function() {
-						mfp.next();
+						overlay.next();
 					});	
 
-					// Polyfill for :before and :after (adds elements with classes mfp-a and mfp-b)
-					if(mfp.isIE7) {
+					// Polyfill for :before and :after (adds elements with classes overlay-a and overlay-b)
+					if(overlay.isIE7) {
 						_getEl('b', arrowLeft[0], false, true);
 						_getEl('a', arrowLeft[0], false, true);
 						_getEl('b', arrowRight[0], false, true);
 						_getEl('a', arrowRight[0], false, true);
 					}
 
-					mfp.container.append(arrowLeft.add(arrowRight));
+					overlay.container.append(arrowLeft.add(arrowRight));
 				}
 			});
 
-			_mfpOn(CHANGE_EVENT+ns, function() {
-				if(mfp._preloadTimeout) clearTimeout(mfp._preloadTimeout);
+			_overlayOn(CHANGE_EVENT+ns, function() {
+				if(overlay._preloadTimeout) clearTimeout(overlay._preloadTimeout);
 
-				mfp._preloadTimeout = setTimeout(function() {
-					mfp.preloadNearbyImages();
-					mfp._preloadTimeout = null;
+				overlay._preloadTimeout = setTimeout(function() {
+					overlay.preloadNearbyImages();
+					overlay._preloadTimeout = null;
 				}, 16);		
 			});
 
 
-			_mfpOn(CLOSE_EVENT+ns, function() {
+			_overlayOn(CLOSE_EVENT+ns, function() {
 				_document.off(ns);
-				mfp.wrap.off('click'+ns);
+				overlay.wrap.off('click'+ns);
 			
-				if(mfp.arrowLeft && supportsFastClick) {
-					mfp.arrowLeft.add(mfp.arrowRight).destroyMfpFastClick();
+				if(overlay.arrowLeft && supportsFastClick) {
+					overlay.arrowLeft.add(overlay.arrowRight).destroyoverlayFastClick();
 				}
-				mfp.arrowRight = mfp.arrowLeft = null;
+				overlay.arrowRight = overlay.arrowLeft = null;
 			});
 
 		}, 
 		next: function() {
-			mfp.direction = true;
-			mfp.index = _getLoopedId(mfp.index + 1);
-			mfp.updateItemHTML();
+			overlay.direction = true;
+			overlay.index = _getLoopedId(overlay.index + 1);
+			overlay.updateItemHTML();
 		},
 		prev: function() {
-			mfp.direction = false;
-			mfp.index = _getLoopedId(mfp.index - 1);
-			mfp.updateItemHTML();
+			overlay.direction = false;
+			overlay.index = _getLoopedId(overlay.index - 1);
+			overlay.updateItemHTML();
 		},
 		goTo: function(newIndex) {
-			mfp.direction = (newIndex >= mfp.index);
-			mfp.index = newIndex;
-			mfp.updateItemHTML();
+			overlay.direction = (newIndex >= overlay.index);
+			overlay.index = newIndex;
+			overlay.updateItemHTML();
 		},
 		preloadNearbyImages: function() {
-			var p = mfp.st.gallery.preload,
-				preloadBefore = Math.min(p[0], mfp.items.length),
-				preloadAfter = Math.min(p[1], mfp.items.length),
+			var p = overlay.st.gallery.preload,
+				preloadBefore = Math.min(p[0], overlay.items.length),
+				preloadAfter = Math.min(p[1], overlay.items.length),
 				i;
 
-			for(i = 1; i <= (mfp.direction ? preloadAfter : preloadBefore); i++) {
-				mfp._preloadItem(mfp.index+i);
+			for(i = 1; i <= (overlay.direction ? preloadAfter : preloadBefore); i++) {
+				overlay._preloadItem(overlay.index+i);
 			}
-			for(i = 1; i <= (mfp.direction ? preloadBefore : preloadAfter); i++) {
-				mfp._preloadItem(mfp.index-i);
+			for(i = 1; i <= (overlay.direction ? preloadBefore : preloadAfter); i++) {
+				overlay._preloadItem(overlay.index-i);
 			}
 		},
 		_preloadItem: function(index) {
 			index = _getLoopedId(index);
 
-			if(mfp.items[index].preloaded) {
+			if(overlay.items[index].preloaded) {
 				return;
 			}
 
-			var item = mfp.items[index];
+			var item = overlay.items[index];
 			if(!item.parsed) {
-				item = mfp.parseEl( index );
+				item = overlay.parseEl( index );
 			}
 
-			_mfpTrigger('LazyLoad', item);
+			_overlayTrigger('LazyLoad', item);
 
 			if(item.type === 'image') {
-				item.img = $('<img class="mfp-img" />').on('load.mfploader', function() {
+				item.img = $('<img class="overlay-img" />').on('load.overlayloader', function() {
 					item.hasSize = true;
-				}).on('error.mfploader', function() {
+				}).on('error.overlayloader', function() {
 					item.hasSize = true;
 					item.loadError = true;
-					_mfpTrigger('LazyLoadError', item);
+					_overlayTrigger('LazyLoadError', item);
 				}).attr('src', item.src);
 			}
 
