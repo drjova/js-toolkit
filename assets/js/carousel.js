@@ -131,14 +131,8 @@
                     };
                 });
             }
-            if(base.options.autoplay.pauseOnHover){
-                base.$imageHolder.find('img').mouseout(function() {
-                    base.clearAutoplay();
-                }).mouseover(function() {
-                    base.startAutoplay();
-                });
-            }
-            if(base.options.showControls){
+            
+            if(base.options.showControls && base.options.enableAutoplay){
                 base.$el.find('.carousel-controls').find('a').on('click',function(){
                     if($(this).data('state') == 'play'){
                         base.clearAutoplay();
@@ -219,7 +213,6 @@
     $.carousel.defaultOptions = {
        data               : null,
        showNavigation     : true,
-       showCaptions       : true,
        showControls       : true,
        showCounter        : true,
        enableAutoplay     : true,

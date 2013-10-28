@@ -1,0 +1,105 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>%(title)s</title>
+    <!-- scripts -->
+    <script src="http://pccis55.cern.ch/js/jquery.min.js"></script>
+    <script src="http://pccis55.cern.ch/js/jquery-ui.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+           // Imporant stuff
+           var API_URL       = 'https://pccis55.cern.ch/media/album?format=gallery&album_id={{RECORD_ID}}&options={{OPTIONS}}',
+               RECORD_ID     =  294;
+
+
+           var  $preview    = $('#embed-form-preview-iframe'),
+                $iframe     = $('#theiframe'),
+                $codePanel  = $('#embed-form-grab'),
+                $paste      = $('#grap-the-code'),
+                $form       = $('#embed-form-setting-options'),
+                $button     = $('.show-code');
+
+            // Initialize all things
+            $codePanel.hide();
+            $button.on('click',function(){
+                $codePanel.show();
+            })
+            $form.on('change',function(){
+                var width  = $(this).find('[name=width]').val(),
+                    height = $(this).find('[name=height]').val(),
+                    data   = $(this).serialize();
+                // replace `&` with `,` to be as we want for the gallery
+                data = data.replace(/&/g,',');
+               
+                $iframe.attr('width',width);
+                $iframe.attr('height',height);
+                
+                $iframe.attr('src',API_URL.replace(/{{RECORD_ID}}/g, RECORD_ID).replace(/{{OPTIONS}}/g,data) );
+                $paste.val($iframe.clone().html());
+            })
+        });
+    </script>
+    <!-- scripts -->
+
+    <!-- styles -->
+    <link rel="stylesheet" href="http://pccis55.cern.ch/css/bootstrap/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="http://pccis55.cern.ch/css/carousel.css" type="text/css" />
+    <!-- styles -->
+
+</head>
+<body>
+    <div class="container">
+
+
+        <div id="embed-form">
+            <div id="embed-form-preview">
+                <h4>Preview</h4>
+                <center>
+                    <iframe id="theiframe" width="300" height="220" src="https://pccis55.cern.ch/media/album?album_id=294&format=gallery" scrolling="no" frameborder="0"></iframe>
+                </center>
+            </div> <!-- embed-form-preview -->
+            <hr />
+            <div id="embed-form-settings">
+                <h4>Settings</h4>
+                <form id="embed-form-setting-options" class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label">Width</label>
+                       <div class="controls">
+                            <input type="text" name="width" placeholder="Width" value="300" />
+                       </div> <!-- control -->
+                    </div> <!-- control-group -->
+                     <div class="control-group">
+                         <label class="control-label">Height</label>
+                        <div class="controls">
+                            <input type="text" name="height" placeholder="Width" value="300" />
+                       </div> <!-- control -->
+                    </div>
+                    <div class="control-group">
+                      <label class="control-label">Autoplay</label>
+                       <div class="controls">
+                            <select name="enableAytoplay">
+                                <option value="true">Yes</option>
+                                <option value="false" selected>No</option>
+                            </select>
+                       </div> <!-- control -->
+                    </div> <!-- control-group -->
+                    <div class="control-group">
+                       <label class="control-label">Show Navigation</label>
+                       <div class="controls">
+                            <select name="showNavigation">
+                                <option value="true">Yes</option>
+                                <option value="false" selected>No</option>
+                            </select>
+                       </div> <!-- control -->
+                    </div> <!-- control-group -->
+                </form>
+            </div><!-- embed-form-settings -->
+            <a href="javascript:void(0)" class="show-code btn btn-primary btn-block">Grap the code</a>
+            <div id="embed-form-grab">
+                <h4>Grap the code</h4>
+                <textarea id="grap-the-code"></textarea>
+            </div><!-- embed-form-grab -->
+        </div>
+    </div>
+</body>
+</html>
