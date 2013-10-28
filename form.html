@@ -4,54 +4,87 @@
     <title>%(title)s</title>
     <!-- scripts -->
     <script src="http://pccis55.cern.ch/js/jquery.min.js"></script>
-    <script src="http://pccis55.cern.ch/js/jquery-ui.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
            // Imporant stuff
            var API_URL       = 'https://pccis55.cern.ch/media/album?format=gallery&album_id={{RECORD_ID}}&options={{OPTIONS}}',
-               RECORD_ID     =  294;
+               RECORD_ID     =  294,
+               IFRAME        = '<iframe width="{{width}}" height="{{height}}" src="{{src}}" scrolling="no" frameborder="0"></iframe>';
 
 
-           var  $preview    = $('#embed-form-preview-iframe'),
-                $iframe     = $('#theiframe'),
-                $codePanel  = $('#embed-form-grab'),
-                $paste      = $('#grap-the-code'),
-                $form       = $('#embed-form-setting-options'),
-                $button     = $('.show-code');
+           var  $preview       = $('#embed-form-preview'),
+                $iframe        = $('#theiframe'),
+                
+                $codePanel     = $('#embed-form-grab'),
+                $paste         = $('#grap-the-code'),
+                
+                $form          = $('#embed-form-setting-options'),
+                $button        = $('.show-code'),
 
+                $autoPlaySpeed = $('#autoplaySpeed'),
+                $showControls  = $('#showControls');
+ 
             // Initialize all things
             $codePanel.hide();
             $button.on('click',function(){
                 $codePanel.show();
             })
-            $form.on('change',function(){
-                var width  = $(this).find('[name=width]').val(),
-                    height = $(this).find('[name=height]').val(),
-                    data   = $(this).serialize();
+            $form.bind('change',buildIframe);
+            buildIframe();
+            $iframe.load(showIframe);
+            function buildIframe(){
+                hideIframe();
+                var width  = $form.find('[name=width]').val(),
+                    height = $form.find('[name=height]').val(),
+                    data   = $form.serialize();
                 // replace `&` with `,` to be as we want for the gallery
                 data = data.replace(/&/g,',');
                
                 $iframe.attr('width',width);
                 $iframe.attr('height',height);
-                
                 $iframe.attr('src',API_URL.replace(/{{RECORD_ID}}/g, RECORD_ID).replace(/{{OPTIONS}}/g,data) );
-                $paste.val($iframe.clone().html());
-            })
+                
+                // Hide unnecessary stuff
+                if($form.find('[name=enableAutoplay]').val() == 'true'){
+                    $autoPlaySpeed.show();
+                    $showControls.show();
+                }else{
+                    $autoPlaySpeed.hide();
+                    $showControls.hide();
+                }
+
+                // Update the code
+                buildCode();
+            }
+            function buildCode(){
+               $paste.val(IFRAME.replace(/{{src}}/g,$iframe.attr('src')).replace(/{{width}}/g,$iframe.attr('width')).replace(/{{height}}/,$iframe.attr('height')));
+            }
+            function showIframe(){
+                $preview.find('.loading').remove();
+                $iframe.show();
+            }
+            function hideIframe(){
+                $iframe.hide();
+                $preview.append('<span class="loading"><center>Loading...</center></span>');
+            }
         });
     </script>
     <!-- scripts -->
 
     <!-- styles -->
     <link rel="stylesheet" href="http://pccis55.cern.ch/css/bootstrap/bootstrap.min.css" type="text/css" />
-    <link rel="stylesheet" href="http://pccis55.cern.ch/css/carousel.css" type="text/css" />
+    <style type="text/css">
+        #grap-the-code{
+            width: 100%;
+            height: 80px;
+            resize:none;
+        }
+    </style>
     <!-- styles -->
-
+    
 </head>
 <body>
-    <div class="container">
-
-
-        <div id="embed-form">
+    <div id="embed-form">
             <div id="embed-form-preview">
                 <h4>Preview</h4>
                 <center>
@@ -65,21 +98,34 @@
                     <div class="control-group">
                         <label class="control-label">Width</label>
                        <div class="controls">
-                            <input type="text" name="width" placeholder="Width" value="300" />
+                            <input type="text" name="width" placeholder="Width" value="280" />
                        </div> <!-- control -->
                     </div> <!-- control-group -->
                      <div class="control-group">
                          <label class="control-label">Height</label>
                         <div class="controls">
-                            <input type="text" name="height" placeholder="Width" value="300" />
+                            <input type="text" name="height" placeholder="Width" value="220" />
                        </div> <!-- control -->
                     </div>
                     <div class="control-group">
+                       <label class="control-label">Transition Speed</label>
+                       <div class="controls">
+                            <input type="text" name="transitionSpeed" placeholder="Transaction" value="800" />
+                       </div> <!-- control -->
+                    </div> <!-- control-group -->
+
+                    <div id="autoplaySpeed" class="control-group">
+                       <label class="control-label">Autoplay Speed</label>
+                       <div class="controls">
+                            <input type="text" name="autoplaySpeed" placeholder="Autoplay" value="12000" />
+                       </div> <!-- control -->
+                    </div> <!-- control-group -->
+                    <div class="control-group">
                       <label class="control-label">Autoplay</label>
                        <div class="controls">
-                            <select name="enableAytoplay">
-                                <option value="true">Yes</option>
-                                <option value="false" selected>No</option>
+                            <select name="enableAutoplay">
+                                <option value="true"  selected>Yes</option>
+                                <option value="false">No</option>
                             </select>
                        </div> <!-- control -->
                     </div> <!-- control-group -->
@@ -87,11 +133,44 @@
                        <label class="control-label">Show Navigation</label>
                        <div class="controls">
                             <select name="showNavigation">
-                                <option value="true">Yes</option>
-                                <option value="false" selected>No</option>
+                                <option value="true"  selected>Yes</option>
+                                <option value="false">No</option>
                             </select>
                        </div> <!-- control -->
                     </div> <!-- control-group -->
+                    <div id="showControls" class="control-group">
+                       <label class="control-label">Show Controls</label>
+                       <div class="controls">
+                            <select name="showControls">
+                                <option value="true">Yes</option>
+                                <option value="false" selected="">No</option>
+                            </select>
+                       </div> <!-- control -->
+                    </div> <!-- control-group -->
+
+                    <div class="control-group">
+                           <label class="control-label">Transition Effect</label>
+                           <div class="controls">
+                                <select name="effect">
+                                    <option value="blind">Blind</option>
+                                    <option value="bounce">Bounce</option>
+                                    <option value="clip">Clip</option>
+                                    <option value="drop">Drop</option>
+                                    <option value="explode">Explode</option>
+                                    <option value="fade">Fade</option>
+                                    <option value="fold">Fold</option>
+                                    <option value="highlight">Highlight</option>
+                                    <option value="puff">Puff</option>
+                                    <option value="pulsate">Pulsate</option>
+                                    <option value="scale">Scale</option>
+                                    <option value="size">Size</option>
+                                    <option value="slide" selected>Slide</option>
+                                    <option value="transfer">Transfer</option>
+                                </select>
+                           </div> <!-- control -->
+                    </div> <!-- control-group -->
+                   
+                    
                 </form>
             </div><!-- embed-form-settings -->
             <a href="javascript:void(0)" class="show-code btn btn-primary btn-block">Grap the code</a>
@@ -100,6 +179,6 @@
                 <textarea id="grap-the-code"></textarea>
             </div><!-- embed-form-grab -->
         </div>
-    </div>
+
 </body>
 </html>
