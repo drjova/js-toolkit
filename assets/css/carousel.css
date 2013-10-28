@@ -4,7 +4,6 @@ html{
 	height: 100%;
 	width: 100%;
 	position: relative;
-	font-family: Helvetica;
 }
 body{
 	padding: 0;
@@ -76,7 +75,7 @@ a.carousel-navigation-arrow.carousel-navigation-forth {
 	font-size:12px;
 	width: 100%;
 	bottom: 0;
-	padding: 2px;
+	padding: 2px 0;
 }
 .carousel-controls:hover a{
 	opacity: 1;
@@ -95,7 +94,6 @@ a.carousel-navigation-arrow.carousel-navigation-forth {
 .carousel-counter{
 	z-index: 20;
 	position:absolute;
-	width: 100%;
 	color: #fff;
 	font-size:10px;
 	padding: 2px;
@@ -112,10 +110,7 @@ a.carousel-navigation-arrow.carousel-navigation-forth {
 	background: black;
 	right: 0;
 	margin:auto;
-	/*width: 265px;*/
-	/*height: 200px;*/
-	width: 600px!important;
-	height: 440px!important;
+	
 }
 .carousel-img {
 	width: 100%;
