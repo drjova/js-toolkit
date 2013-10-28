@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>%(title)s</title>
+	<link rel="stylesheet" href="http://pccis55.cern.ch/css/bootstrap/bootstrap.min.css" type="text/css" />
+	<link rel="stylesheet" href="https://pccis55.cern.ch/img/jquery-ui.css" type="text/css" />
+	<script src="http://pccis55.cern.ch/js/jquery.min.js"></script>
+	<script src="http://pccis55.cern.ch/js/jquery-ui.min.js"></script>
+	<script src="http://pccis55.cern.ch/js/carousel.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$preview = $('#theiframe');
+			$code    = $('#getCode');
+			$('#iframe-form').on('change',function(){
+				var data = $(this).serialize();
+				var width  = $(this).find('[name=width]').val();
+				var height = $(this).find('[name=height]').val();
+				$preview.attr('width',width);
+				$preview.attr('height',height);
+			})
+		});
+	</script>
+</head>
+<body>
+	 <div id="popup-iframe" class="white-popup-block overlay-hide">
+            <div class="iframe-top">
+                <h4>Preview</h4>
+                <center>
+                <iframe id="theiframe" width="100%" height="300" src="https://pccis55.cern.ch/media/album?album_id=294&format=gallery" scrolling="no" frameborder="0"></iframe>
+                </center>
+            </div>
+            <div style="clear:both"></div>
+            <hr />
+            <div class="iframe-bottom">
+            		 <h4>Settings</h4>
+                    <form class="form-horizontal" id="iframe-form">
+                         <div class="control-group">
+                            <label class="control-label">Width</label>
+                            <div class="controls">
+                              <input type="text" name="width" placeholder="Width" value="300">
+                            </div>
+                          </div>
+                          <div class="control-group">
+                            <label class="control-label">Height</label>
+                            <div class="controls">
+                              <input type="text" name="height" placeholder="Height" value="300">
+                            </div>
+                          </div>
+                          <div class="control-group">
+                            <label class="control-label">Show Navigation</label>
+                            <div class="controls">
+                                <select name="showNavigation">
+                                    <option value="True">Yes</option>
+                                    <option value="False" selected>No</option>
+                                </select>
+                            </div>
+                          </div>
+                          <div class="control-group ">
+                            <label class="control-label">Enable Autoplay</label>
+                            <div class="controls">
+                                <select name="enableAytoplay">
+                                    <option value="True">Yes</option>
+                                    <option value="False" selected>No</option>
+                                </select>
+                            </div>
+                          </div>
+                           <div class="control-group">
+                            <label class="control-label">Show Controls</label>
+                            <div class="controls">
+                                <select name="showControls">
+                                    <option value="True">Yes</option>
+                                    <option value="False" selected>No</option>
+                                </select>
+                            </div>
+                          </div>
+                          <div class="control-group">
+                            <label class="control-label">Show Counter</label>
+                            <div class="controls">
+                                <select name="showCounter">
+                                    <option value="True">Yes</option>
+                                    <option value="False" selected>No</option>
+                                </select>
+                            </div>
+                          </div>
+                          <div class="control-group">
+                            <label class="control-label">Keyboard Navigation</label>
+                            <div class="controls">
+                                <select name="keyboardNavigation">
+                                    <option value="True" selected>Yes</option>
+                                    <option value="False">No</option>
+                                </select>
+                            </div>
+                          </div>
+                         <a class="btn btn-primary btn-block" onclick="$('#getCode').show();" href="javascript:void(0)">Get the code</a>
+                    </form>
+				<div id="getCode" class="well hide well-small">
+                    <textarea id="theCode" style="box-shadow:none;width:90%;border:none;resize:none;background:transparent;" rows="3" height="100px"><iframe src="https://pccis55.cern.ch//media/album?album_id=294&format=gallery" width="300" height="300" scrolling="no" frameborder="0"></iframe></textarea>
+                </div>
+            </div>
+        </div>
+</body>
+</html>
