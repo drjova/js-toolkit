@@ -76,9 +76,11 @@
         }
         base.changeImage = function(index){
            if(base.$el.data('cache') == 'false'){
-                base.$imageHolder.html($('<img  />').attr({
+              var $image = $('<img  />').attr({
                     src: base.options.data.photos[index]['sizes'][base.$el.data('size')],
-                }))
+                }).data('photo_id',base.options.data.photos[index]['recID'])
+
+                base.$imageHolder.html($image);
             }else{
                  base.$imageHolder.html(base.cache[index]);
             }
@@ -205,6 +207,7 @@
             $.when($.each(base.options.data.photos.slice(start,end),function(index,photo){
                 var cacheImage = document.createElement('img');
                 cacheImage.src = photo.sizes[base.$el.data('size')];
+                cacheImage.setAttribute('data-photo_id',photo.recID);
                 base.cache[start+index] = cacheImage;
             })).done(function(){
                 deff.resolve();
@@ -222,7 +225,6 @@
        enableAutoplay     : true,
        enablepreload      : 3,
        keyboardNavigation : true,
-       onImageClick       : false, // (false|link|overlay)
        style: {
             wrapper : {
                 'color':'#fff',
