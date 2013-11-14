@@ -232,7 +232,7 @@
                 base.interval = setInterval(base.navigation.next,base.options.autoplay.speed)
             },
             pause: function(){
-                clearInterval(base.interval);
+                base.interval = clearInterval(base.interval);
             }
         }
         base.handler = {
@@ -368,24 +368,18 @@
             var record = base.options.data.photos[index];
             return record.recID;
         }
-        base.autoHide = {
+        /*base.autoHide = {
             init : function(){
-                base.$widgetsD = $('.carousel-widgets');
-                base.$navigationD = $('.carousel-navigation');
                 base.$el.bind('mouseover',base.autoHide.show);
-                base.$widgetsD.bind('mouseover',base.autoHide.show)
-                base.$navigationD.bind('mouseover',base.autoHide.show)
                 base.$el.bind('mouseout',base.autoHide.hide);
             },
             show: function(){
-                base.$widgetsD.stop(false,true).fadeIn();
-                base.$navigationD.stop(false,true).fadeIn();
+                base.autoplay.pause();
             },
             hide: function(){
-                base.$widgetsD.stop(false,true).fadeOut(1000);
-                base.$navigationD.stop(false,true).fadeOut(1000);
+                base.autoplay.init();
             }
-        }
+        } */
         base.init();
     }; // End of the plugin
 
