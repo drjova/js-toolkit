@@ -16,11 +16,13 @@ body{
 .carousel{
 	width: 100%;
 	height: 100%;
+	overflow: hidden!important;
 }
 .carousel-wrapper{
 	height: 100%;
 	width: 100%;
 	background: #c8c1c8!important;
+	overflow: hidden!important;
 }
 /* Navigation */
 .carousel-navigation{
@@ -29,6 +31,7 @@ body{
 	width: 100%;
 	height: 62px;
 	left: 0px;
+
 }
 a.carousel-navigation-arrow{
   position: absolute;
@@ -112,17 +115,21 @@ a.carousel-navigation-arrow.carousel-navigation-forth {
 	right: 0;
 	margin:auto;
 	width: 100%;
+	overflow: hidden!important;
 	height: 100%;
-	
 }
 .carousel-img {
-	width: 100%;
+	width: 1100%;
 	height: 100%;
 	text-align: center;
 	float: left;
+	overflow: hidden!important;
 	position: relative!important;
 }
 .carousel-img img{
+	float: left;
+}
+.carousel-img_img img{
 	position: absolute;
 	top: 0;
 	right:0;
